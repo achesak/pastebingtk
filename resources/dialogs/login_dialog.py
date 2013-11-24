@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-# This file defines the Add Fossil dialog.
+# This file defines the Login dialog.
 
 
 # Import GTK for the dialog.

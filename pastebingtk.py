@@ -48,8 +48,12 @@ import webbrowser
 
 # Import the application's UI data.
 from resources.ui import VERSION, TITLE, MENU_DATA
+# Import the dictionaries for the constants and formats.
+from resources.dicts import FORMATS, EXPIRE, EXPOSURE
 # Import the login dialog.
 from resources.dialogs.login_dialog import LoginDialog
+# Import the create paste dialog.
+from resources.dialogs.create_dialog import CreatePasteDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
@@ -118,7 +122,7 @@ class PastebinGTK(Gtk.Window):
         # Create the Pastebin menu.
         action_group.add_actions([
             ("pastebin_menu", None, "_Pastebin"),
-            ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", None),
+            ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
             ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", None),
             ("delete_paste", None, "_Delete Paste", "<Control>d", None, None),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, None),
@@ -175,8 +179,40 @@ class PastebinGTK(Gtk.Window):
         self.pastebin_login("ignore")
     
     
+    def create_paste(self, event):
+        """Creates a new paste."""
+        
+        # Show the dialog.
+        new_dlg = CreatePasteDialog(self)
+        response = new_dlg.run()
+        
+        # If the user clicked OK:
+        if response == Gtk.ResponseType.OK:
+            
+            # Get the fields.
+            name = new_dlg.name_ent.get_text()
+            format_ = new_dlg.form_com.get_active_text()
+            expire = new_dlg.expi_com.get_active_text()
+            exposure = new_dlg.expo_com.get_active_text()
+            
+            # Get the values as needed.
+            format_ = FORMATS[format_]
+            expire = EXPIRE[expire]
+            exposure = EXPOSURE[exposure]
+            
+            # Get the text.
+            text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
+            
+            # Send the paste.
+            url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
+            print(url)
+        
+        # Close the dialog.
+        new_dlg.destroy()
+    
+    
     def pastebin_login(self, event):
-        """Shows the login dialog."""
+        """Logs the user in."""
         
         # Show the dialog.
         login_dlg = LoginDialog(self)
