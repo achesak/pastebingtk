@@ -43,9 +43,21 @@ import sys
 import os
 # Import platform for getting the user's OS.
 import platform
+# Import webbrowser for opening webpages.
+import webbrowser
 
 # Import the application's UI data.
 from resources.ui import VERSION, TITLE, MENU_DATA
+# Import the login dialog.
+from resources.dialogs.login_dialog import LoginDialog
+# Import the miscellaneous dialogs.
+from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
+# Import the pastebin API wrapper.
+from resources.pastebin_python.pastebin import PastebinPython
+# Import the API exceptions.
+from resources.pastebin_python.pastebin_exceptions import PastebinBadRequestException, PastebinFileException, PastebinHTTPErrorException, PastebinNoPastesException
+# Import the API options.
+from resources.pastebin_python.pastebin_options import OPTION_DELETE, OPTION_LIST, OPTION_PASTE, OPTION_TRENDS, OPTION_USER_DETAILS
 
 # Tell Python not to create bytecode files, as they mess with the git repo.
 # This line can be removed be the user, if desired.
@@ -69,6 +81,15 @@ class PastebinGTK(Gtk.Window):
 
     def __init__(self):
         """Create the application."""
+        
+        # Variables for remembering user data.
+        self.user_name = ""
+        self.user_key = ""
+        self.dev_key = "d2314ff616133e54f728918b8af1500e"
+        self.login = False
+        
+        # Initalize the PastebinPython object.
+        self.api = PastebinPython(api_dev_key = self.dev_key)
         
         # Create the window.
         Gtk.Window.__init__(self, title = TITLE)
@@ -102,6 +123,8 @@ class PastebinGTK(Gtk.Window):
             ("delete_paste", None, "_Delete Paste", "<Control>d", None, None),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, None),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, None),
+            ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
+            ("logout", None, "Logo_ut", "<Shift><Control>1", None, self.pastebin_logout),
             ("get_user_info", None, "Get User's _Info...", "<Control>i", None, None),
             ("save", Gtk.STOCK_SAVE, "_Save to File...", "<Control>s", "Save to file", None),
             ("open", Gtk.STOCK_OPEN, "_Open from File...", "<Control>o", "Open from file", None),
@@ -117,8 +140,8 @@ class PastebinGTK(Gtk.Window):
         # Create the Help menu.
         action_group.add_actions([
             ("help_menu", None, "_Help"),
-            ("about", None, "_About...", "<Shift>F1", None, None),
-            ("help", None, "_Help...", "F1", None, None)
+            ("about", None, "_About...", "<Shift>F1", None, self.show_about),
+            ("help", None, "_Help...", "F1", None, self.show_help)
         ])
         
         # Create the UI manager.
@@ -147,6 +170,105 @@ class PastebinGTK(Gtk.Window):
         # Add the grid to the main window.
         self.add(grid)
         self.show_all()
+        
+        # Get the user login details.
+        self.pastebin_login("ignore")
+    
+    
+    def pastebin_login(self, event):
+        """Shows the login dialog."""
+        
+        # Show the dialog.
+        login_dlg = LoginDialog(self)
+        response = login_dlg.run()
+        
+        # If the user clicked OK:
+        if response == Gtk.ResponseType.OK:
+            user_name = login_dlg.name_ent.get_text()
+            password = login_dlg.pass_ent.get_text()
+            
+            # If the username and password are valid, get the user key
+            if user_name != "" and password != "":
+                
+                try:
+                    self.user_key = self.api.createAPIUserKey(user_name, password)
+                    self.user_name = user_name
+                    self.login = True
+                    
+                    show_alert_dialog(self, "Login", "Successfully logged in as %s." % user_name)
+                
+                except PastebinBadRequestException:
+                    
+                    show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
+                    self.login = False
+            
+            else:
+                
+                show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % "username" if user_name == "" else "password")
+                self.login = False
+        
+        else:
+            
+            show_alert_dialog(self, "Login", "No username or password specified.\n\nNot logged in.")
+            self.login = False
+            
+        # Close the dialog.
+        login_dlg.destroy()
+    
+    
+    def pastebin_logout(self, event):
+        """Logs the user out."""
+        
+        self.login = False
+        show_alert_dialog(self, "Logout", "You are now logged out.")
+    
+    
+    def show_about(self, event):
+        """Shows the About dialog."""
+        
+        # Load the icon.
+        img_file = open("resources/images/icon.png", "rb")
+        img_bin = img_file.read()
+        img_file.close()
+        
+        # Get the PixBuf.
+        loader = GdkPixbuf.PixbufLoader.new_with_type("png")
+        loader.write(img_bin)
+        loader.close()
+        pixbuf = loader.get_pixbuf()
+        
+        # Create the dialog.
+        about_dlg = Gtk.AboutDialog()
+        
+        # Set the title.
+        about_dlg.set_title("About " + TITLE)
+        # Set the program name.
+        about_dlg.set_program_name(TITLE)
+        # Set the program icon.
+        about_dlg.set_logo(pixbuf)
+        # Set the program version.
+        about_dlg.set_version(VERSION)
+        # Set the comments.
+        about_dlg.set_comments("PastebinGTK is a desktop client for pastebin.com.")
+        # Set the copyright notice.
+        about_dlg.set_copyright("Copyright (c) 2013 Adam Chesak")
+        # Set the authors.
+        about_dlg.set_authors(["Adam Chesak <achesak@yahoo.com>"])
+        # Set the license.
+        about_dlg.set_license(license_text)
+        # Set the website.
+        about_dlg.set_website("http://poultryandprogramming.wordpress.com/")
+        about_dlg.set_website_label("http://poultryandprogramming.wordpress.com/")
+        
+        # Show the dialog.
+        about_dlg.show_all()
+    
+    
+    def show_help(self, event):
+        """Shows the help in a web browser."""
+        
+        # Open the help file.
+        webbrowser.open_new("resources/help/help.html")  
     
     
     def exit(self, x, y):
