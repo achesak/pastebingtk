@@ -45,6 +45,8 @@ import os
 import platform
 # Import webbrowser for opening webpages.
 import webbrowser
+# Import urllib2 for working with urls.
+import urllib2
 
 # Import the application's UI data.
 from resources.ui import VERSION, TITLE, MENU_DATA
@@ -213,11 +215,17 @@ class PastebinGTK(Gtk.Window):
             expire = EXPIRE[expire]
             exposure = EXPOSURE[exposure]
             
-            # Send the paste.
-            url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
+            try:            
+                # Send the paste.
+                url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
+                
+                # Show the url.
+                show_alert_dialog(self, "Create Paste", "Paste has been successfully created, and can be found at the following URL:\n\n%s" % url)
             
-            # Show the url.
-            show_alert_dialog(self, "Create Paste", "Paste has been successfully created, and can be found at the following URL:\n\n%s" % url)
+            except urllib2.URLError:
+                
+                # Show an error if the paste could not be sent. This will occur if the user isn't connected to the internet.
+                show_error_dialog(self, "Create Paste", "Paste could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
         
         # Close the dialog.
         new_dlg.destroy()
@@ -249,6 +257,11 @@ class PastebinGTK(Gtk.Window):
                 except PastebinBadRequestException:
                     
                     show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
+                    self.login = False
+                
+                except urllib2.URLError:
+                    
+                    show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
                     self.login = False
             
             else:
