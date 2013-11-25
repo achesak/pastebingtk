@@ -171,6 +171,11 @@ class PastebinGTK(Gtk.Window):
         # Add the scrolled window to the window.
         grid.attach_next_to(scrolled_window, toolbar, Gtk.PositionType.BOTTOM, 1, 1)
         
+        # Add the status bar.
+        self.status_lbl = Gtk.Label("Not logged in")
+        self.status_lbl.set_alignment(0, 0.5)
+        grid.attach_next_to(self.status_lbl, scrolled_window, Gtk.PositionType.BOTTOM, 1, 1)
+        
         # Add the grid to the main window.
         self.add(grid)
         self.show_all()
@@ -238,6 +243,7 @@ class PastebinGTK(Gtk.Window):
                     self.user_name = user_name
                     self.login = True
                     
+                    self.status_lbl.set_text("Logged in as %s" % user_name)
                     show_alert_dialog(self, "Login", "Successfully logged in as %s." % user_name)
                 
                 except PastebinBadRequestException:
@@ -263,6 +269,7 @@ class PastebinGTK(Gtk.Window):
         """Logs the user out."""
         
         self.login = False
+        self.status_lbl.set_text("Not logged in")
         show_alert_dialog(self, "Logout", "You are now logged out.")
     
     
