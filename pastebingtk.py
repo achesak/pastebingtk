@@ -182,6 +182,14 @@ class PastebinGTK(Gtk.Window):
     def create_paste(self, event):
         """Creates a new paste."""
         
+        # Get the text.
+        text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
+        
+        # If there's no text, don't create the paste.
+        if not text:
+            show_error_dialog(self, "Create Paste", "No text entered.")
+            return
+        
         # Show the dialog.
         new_dlg = CreatePasteDialog(self)
         response = new_dlg.run()
@@ -200,12 +208,11 @@ class PastebinGTK(Gtk.Window):
             expire = EXPIRE[expire]
             exposure = EXPOSURE[exposure]
             
-            # Get the text.
-            text = self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False)
-            
             # Send the paste.
             url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
-            print(url)
+            
+            # Show the url.
+            show_alert_dialog(self, "Create Paste", "Paste has been successfully created, and can be found at the following URL:\n\n%s" % url)
         
         # Close the dialog.
         new_dlg.destroy()
