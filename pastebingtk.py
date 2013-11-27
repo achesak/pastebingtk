@@ -62,6 +62,8 @@ from resources.dialogs.login_dialog import LoginDialog
 from resources.dialogs.create_dialog import CreatePasteDialog
 # Import the get paste dialog.
 from resources.dialogs.get_dialog import GetPasteDialog
+# Import the delete paste dialog.
+from resources.dialogs.delete_dialog import DeletePasteDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
@@ -128,7 +130,7 @@ class PastebinGTK(Gtk.Window):
             ("pastebin_menu", None, "_Pastebin"),
             ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
             ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", self.get_paste),
-            ("delete_paste", None, "_Delete Paste", "<Control>d", None, None),
+            ("delete_paste", None, "_Delete Paste", "<Control>d", None, self.delete_paste),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, None),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, None),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
@@ -259,7 +261,7 @@ class PastebinGTK(Gtk.Window):
             
             except PastebinHTTPErrorException:
                 
-                # Show an error if the paste count not be retreived. This will occur if the key is invalid.
+                # Show an error if the paste could not be retreived. This will occur if the key is invalid.
                 show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste key was specifed.")
                 
             else:
@@ -270,6 +272,57 @@ class PastebinGTK(Gtk.Window):
             
         # Close the dialog.
         get_dlg.destroy()
+    
+    
+    def delete_paste(self, event):
+        """Deletes an existing paste."""
+        
+        # The user must be logged in to do this.
+        if not self.login:
+            show_error_dialog(self, "Delete Paste", "Must be logged in to delete a paste.")
+        
+        # Run the function to get the list of pastes, for whatever reason.
+        self.api.listUserPastes()
+        
+        # Show the dialog.
+        del_dlg = DeletePasteDialog(self)
+        response = del_dlg.run()
+        
+        # If the user pressed OK:
+        if response == Gtk.ResponseType.OK:
+            
+            # Get the key.
+            key = del_dlg.key_ent.get_text()
+            
+            try:
+                
+                # Get the paste.
+                paste = self.api.deletePaste(api_paste_key = key)
+            
+            except urllib2.URLError:
+                
+                # Show an error if the paste could not be deleted. This will occur if the user isn't connected to the internet.
+                show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            
+            except PastebinHTTPErrorException:
+                
+                # Show an error if the paste could not be deleted. This will occur if the key is invalid.
+                show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that an invalid paste key was specifed.")
+                
+            else:
+                
+                if paste == True:
+                    
+                    show_alert_dialog(self, "Delete Paste", "Paste was successfully deleted.")
+                
+                else:
+                    
+                    show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
+            
+        # Close the dialog.
+        del_dlg.destroy()
+        
+        
     
     
     def pastebin_login(self, event):
