@@ -48,6 +48,10 @@ import webbrowser
 # Import urllib2 for working with urls.
 import urllib2
 
+# Tell Python not to create bytecode files, as they mess with the git repo.
+# This line can be removed be the user, if desired.
+sys.dont_write_bytecode = True
+
 # Import the application's UI data.
 from resources.ui import VERSION, TITLE, MENU_DATA
 # Import the dictionaries for the constants and formats.
@@ -56,6 +60,8 @@ from resources.dicts import FORMATS, EXPIRE, EXPOSURE
 from resources.dialogs.login_dialog import LoginDialog
 # Import the create paste dialog.
 from resources.dialogs.create_dialog import CreatePasteDialog
+# Import the get paste dialog.
+from resources.dialogs.get_dialog import GetPasteDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
@@ -64,10 +70,6 @@ from resources.pastebin_python.pastebin import PastebinPython
 from resources.pastebin_python.pastebin_exceptions import PastebinBadRequestException, PastebinFileException, PastebinHTTPErrorException, PastebinNoPastesException
 # Import the API options.
 from resources.pastebin_python.pastebin_options import OPTION_DELETE, OPTION_LIST, OPTION_PASTE, OPTION_TRENDS, OPTION_USER_DETAILS
-
-# Tell Python not to create bytecode files, as they mess with the git repo.
-# This line can be removed be the user, if desired.
-sys.dont_write_bytecode = True
 
 # Get the main directory.
 if platform.system().lower() == "windows":
@@ -125,7 +127,7 @@ class PastebinGTK(Gtk.Window):
         action_group.add_actions([
             ("pastebin_menu", None, "_Pastebin"),
             ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
-            ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", None),
+            ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", self.get_paste),
             ("delete_paste", None, "_Delete Paste", "<Control>d", None, None),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, None),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, None),
@@ -215,7 +217,8 @@ class PastebinGTK(Gtk.Window):
             expire = EXPIRE[expire]
             exposure = EXPOSURE[exposure]
             
-            try:            
+            try:
+                
                 # Send the paste.
                 url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
                 
@@ -229,6 +232,44 @@ class PastebinGTK(Gtk.Window):
         
         # Close the dialog.
         new_dlg.destroy()
+    
+    
+    def get_paste(self, event):
+        """Gets an existing paste."""
+        
+        # Show the dialog.
+        get_dlg = GetPasteDialog(self)
+        response = get_dlg.run()
+        
+        # If the user clicked OK:
+        if response == Gtk.ResponseType.OK:
+            
+            # Get the key.
+            key = get_dlg.key_ent.get_text()
+            
+            try:
+                
+                # Get the paste.
+                paste = self.api.getPasteRawOutput(api_paste_key = key)
+            
+            except urllib2.URLError:
+                
+                # Show an error if the paste could not be retrieved. This will occur if the user isn't connected to the internet.
+                show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            
+            except PastebinHTTPErrorException:
+                
+                # Show an error if the paste count not be retreived. This will occur if the key is invalid.
+                show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste key was specifed.")
+                
+            else:
+                
+                # Delete the current text and insert the new.
+                self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
+                self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
+            
+        # Close the dialog.
+        get_dlg.destroy()
     
     
     def pastebin_login(self, event):
