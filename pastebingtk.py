@@ -135,7 +135,6 @@ class PastebinGTK(Gtk.Window):
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, None),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut", "<Shift><Control>1", None, self.pastebin_logout),
-            ("get_user_info", None, "Get User's _Info...", "<Control>i", None, None),
             ("save", Gtk.STOCK_SAVE, "_Save to File...", "<Control>s", "Save to file", None),
             ("open", Gtk.STOCK_OPEN, "_Open from File...", "<Control>o", "Open from file", None),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
@@ -280,6 +279,7 @@ class PastebinGTK(Gtk.Window):
         # The user must be logged in to do this.
         if not self.login:
             show_error_dialog(self, "Delete Paste", "Must be logged in to delete a paste.")
+            return
         
         # Run the function to get the list of pastes, for whatever reason.
         self.api.listUserPastes()
@@ -321,8 +321,6 @@ class PastebinGTK(Gtk.Window):
             
         # Close the dialog.
         del_dlg.destroy()
-        
-        
     
     
     def pastebin_login(self, event):
@@ -378,6 +376,20 @@ class PastebinGTK(Gtk.Window):
         self.login = False
         self.status_lbl.set_text("Not logged in")
         show_alert_dialog(self, "Logout", "You are now logged out.")
+    
+    
+    def get_user_info(self, event):
+        """Gets info about the currently logged in user."""
+        
+        # The user must be logged in to do this.
+        if not self.login:
+            show_error_dialog(self, "Get User's Info", "Must be logged in to get user's info.")
+            return
+        
+        # Get the user's info.
+        info = self.api.getUserInfos()
+        
+        print(info)
     
     
     def show_about(self, event):
