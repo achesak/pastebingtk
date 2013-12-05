@@ -47,6 +47,8 @@ import platform
 import webbrowser
 # Import urllib2 for working with urls.
 import urllib2
+# Import time for working with time.
+import time
 
 # Tell Python not to create bytecode files, as they mess with the git repo.
 # This line can be removed be the user, if desired.
@@ -64,6 +66,8 @@ from resources.dialogs.create_dialog import CreatePasteDialog
 from resources.dialogs.get_dialog import GetPasteDialog
 # Import the delete paste dialog.
 from resources.dialogs.delete_dialog import DeletePasteDialog
+# Import the list dialog.
+from resources.dialogs.list_dialog import GenericListDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
@@ -132,7 +136,7 @@ class PastebinGTK(Gtk.Window):
             ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", self.get_paste),
             ("delete_paste", None, "_Delete Paste", "<Control>d", None, self.delete_paste),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, None),
-            ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, None),
+            ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, self.list_users_pastes),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut", "<Shift><Control>1", None, self.pastebin_logout),
             ("save", Gtk.STOCK_SAVE, "_Save to File...", "<Control>s", "Save to file", None),
@@ -384,6 +388,60 @@ class PastebinGTK(Gtk.Window):
         self.login = False
         self.status_lbl.set_text("Not logged in")
         show_alert_dialog(self, "Logout", "You are now logged out.")
+    
+    
+    def list_users_pastes(self, event):
+        """Gets the user's pastes"""
+        
+        exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
+        
+        # The user must be logged in to do this.
+        if not self.login:
+            show_error_dialog(self, "List User's Pastes", "Must be logged in to view a user's pastes.")
+            return
+        
+        try:
+            
+            # Run the function to get the list of pastes.
+            pastes = self.api.listUserPastes()
+        
+        except PastebinNoPastesException:
+            
+            # If there are no pastes, tell the user.
+            show_alert_dialog(self, "List User's Pastes", "The currently logged in user has no pastes.")
+            return
+        
+        # Create the list of data.
+        data = []
+        
+        # Loop through the pastes and add the data.
+        for i in pastes:
+            
+            new = []
+            new.append(i["paste_title"])
+            new.append(i["paste_key"])
+            new.append(i["paste_format_long"])
+            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
+            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_expire_date"]))))
+            new.append(exposure[i["paste_private"]])
+            size = int(i["paste_size"])
+            if size < 1000:
+                new.append("%d bytes" % size)
+            elif size < 1000 * 1000:
+                new.append("%d kB" % (size / 1000))
+            else:
+                new.append("%d MB" % (size / (1000 * 1000)))
+            new.append(i["paste_hits"])
+            new.append(i["paste_url"])
+            
+            data.append(new)
+        
+        # Create and the dialog.
+        list_dlg = GenericListDialog(self, "%s's Pastes" % self.user_name, data)
+        list_dlg.run()
+        
+        # Close the dialog.
+        list_dlg.destroy()
     
     
     def show_about(self, event):
