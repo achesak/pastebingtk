@@ -139,8 +139,8 @@ class PastebinGTK(Gtk.Window):
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, self.list_users_pastes),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut", "<Shift><Control>1", None, self.pastebin_logout),
-            ("save", Gtk.STOCK_SAVE, "_Save to File...", "<Control>s", "Save to file", None),
-            ("open", Gtk.STOCK_OPEN, "_Open from File...", "<Control>o", "Open from file", None),
+            ("save", Gtk.STOCK_SAVE, "_Save to File...", "<Control>s", "Save to file", self.save_file),
+            ("open", Gtk.STOCK_OPEN, "_Open from File...", "<Control>o", "Open from file", self.open_file),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
         ])
         
@@ -507,6 +507,73 @@ class PastebinGTK(Gtk.Window):
         
         # Close the dialog.
         list_dlg.destroy()
+    
+    
+    def save_file(self, event):
+        """Saves the text to a file."""
+        
+        # Create the dialog.
+        save_dlg = Gtk.FileChooserDialog("Save to File", self, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        save_dlg.set_do_overwrite_confirmation(True)
+        
+        # Get the response.
+        response = save_dlg.run()
+        if response == Gtk.ResponseType.OK:
+            
+            # Get the filename.
+            filename = save_dlg.get_filename()
+            
+            # Save the data.
+            try:
+                # Write to the specified file.
+                data_file = open(filename, "w")
+                data_file.write(self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False))
+                data_file.close()
+                
+            except IOError:
+                
+                # Show the error message.
+                # This only shows if the error occurred when writing to the file.
+                print("Error writing to file (IOError).")
+            
+        # Close the dialog.
+        save_dlg.destroy()
+    
+    
+    def open_file(self, event):
+        """Opens the text from a file."""
+        
+        # Create the dialog.
+        open_dlg = Gtk.FileChooserDialog("Open from File", self, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
+        open_dlg.set_do_overwrite_confirmation(True)
+        
+        # Get the response.
+        response = open_dlg.run()
+        if response == Gtk.ResponseType.OK:
+            
+            # Get the filename.
+            filename = open_dlg.get_filename()
+            
+            # Read the data.
+            try:
+                
+                # Read from the specified file.
+                data_file = open(filename, "r")
+                data = data_file.read()
+                data_file.close()
+                
+            except IOError:
+                
+                # Show the error message.
+                # This only shows if the error occurred when reading from the file.
+                print("Error reading from file (IOError).")
+            
+            # Delete the old text and insert the new.
+            self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
+            self.text_buffer.insert_at_cursor(data)
+            
+        # Close the dialog.
+        open_dlg.destroy()
     
     
     def show_about(self, event):
