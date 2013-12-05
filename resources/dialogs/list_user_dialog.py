@@ -8,7 +8,7 @@
 from gi.repository import Gtk
 
 
-class GenericListDialog(Gtk.Dialog):
+class ListPastesDialog(Gtk.Dialog):
     """Shows the list dialog."""
     def __init__(self, parent, title, data):
         """Create the dialog."""

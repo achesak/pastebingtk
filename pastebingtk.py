@@ -67,7 +67,7 @@ from resources.dialogs.get_dialog import GetPasteDialog
 # Import the delete paste dialog.
 from resources.dialogs.delete_dialog import DeletePasteDialog
 # Import the list dialog.
-from resources.dialogs.list_dialog import GenericListDialog
+from resources.dialogs.list_user_dialog import ListPastesDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
@@ -135,7 +135,7 @@ class PastebinGTK(Gtk.Window):
             ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
             ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", self.get_paste),
             ("delete_paste", None, "_Delete Paste", "<Control>d", None, self.delete_paste),
-            ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, None),
+            ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, self.list_trending_pastes),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, self.list_users_pastes),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut", "<Shift><Control>1", None, self.pastebin_logout),
@@ -411,6 +411,11 @@ class PastebinGTK(Gtk.Window):
             show_alert_dialog(self, "List User's Pastes", "The currently logged in user has no pastes.")
             return
         
+        except urllib2.URLError:
+            
+            show_error_dialog(self, "List User's Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
         # Create the list of data.
         data = []
         
@@ -422,7 +427,10 @@ class PastebinGTK(Gtk.Window):
             new.append(i["paste_key"])
             new.append(i["paste_format_long"])
             new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
-            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_expire_date"]))))
+            if i["paste_expire_date"] == "0":
+                new.append("Never")
+            else:
+                new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_expire_date"]))))
             new.append(exposure[i["paste_private"]])
             size = int(i["paste_size"])
             if size < 1000:
@@ -437,7 +445,64 @@ class PastebinGTK(Gtk.Window):
             data.append(new)
         
         # Create and the dialog.
-        list_dlg = GenericListDialog(self, "%s's Pastes" % self.user_name, data)
+        list_dlg = ListPastesDialog(self, "%s's Pastes" % self.user_name, data)
+        list_dlg.run()
+        
+        # Close the dialog.
+        list_dlg.destroy()
+    
+    
+    def list_trending_pastes(self, event):
+        """Gets the trending pastes."""
+        
+        exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
+        
+        try:
+            
+            # Run the function to get the list of pastes.
+            pastes = self.api.listTrendingPastes()
+        
+        except PastebinNoPastesException:
+            
+            # If there are no pastes, tell the user.
+            show_alert_dialog(self, "List Trending Pastes", "There are no trending pastes.")
+            return
+        
+        except urllib2.URLError:
+            
+            show_error_dialog(self, "List Trending Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
+        # Create the list of data.
+        data = []
+        
+        # Loop through the pastes and add the data.
+        for i in pastes:
+            
+            new = []
+            new.append(i["paste_title"])
+            new.append(i["paste_key"])
+            new.append(i["paste_format_long"])
+            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
+            if i["paste_expire_date"] == "0":
+                new.append("Never")
+            else:
+                new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_expire_date"]))))
+            new.append(exposure[i["paste_private"]])
+            size = int(i["paste_size"])
+            if size < 1000:
+                new.append("%d bytes" % size)
+            elif size < 1000 * 1000:
+                new.append("%d kB" % (size / 1000))
+            else:
+                new.append("%d MB" % (size / (1000 * 1000)))
+            new.append(i["paste_hits"])
+            new.append(i["paste_url"])
+            
+            data.append(new)
+        
+        # Create and the dialog.
+        list_dlg = ListPastesDialog(self, "Currently Trending Pastes", data)
         list_dlg.run()
         
         # Close the dialog.
