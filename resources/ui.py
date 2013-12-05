@@ -40,6 +40,7 @@ MENU_DATA = """
   <toolbar name="toolbar">
     <toolitem action="create_paste" />
     <toolitem action="get_paste" />
+    <toolitem action="delete_paste" />
     <separator />
     <toolitem action="save" />
     <toolitem action="open" />
