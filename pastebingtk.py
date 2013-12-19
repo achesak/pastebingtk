@@ -68,6 +68,8 @@ from resources.dialogs.get_dialog import GetPasteDialog
 from resources.dialogs.delete_dialog import DeletePasteDialog
 # Import the list dialog.
 from resources.dialogs.list_user_dialog import ListPastesDialog
+# Import the options dialog.
+from resources.dialogs.options_dialog import OptionsDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
@@ -89,6 +91,25 @@ if not os.path.exists(main_dir) or not os.path.isdir(main_dir):
     # Create the directory.
     os.makedirs(main_dir)
 
+# Get the configuration.
+try:
+    # Load the configuration file.
+    config_file = open("%s/config" % main_dir, "r")
+    config = json.load(config_file)
+    config_file.close()
+
+except IOError:
+    # Continue.
+    config = {"dev_key": "d2314ff616133e54f728918b8af1500e",
+              "prompt_login": True,
+              "remember_username": True,
+              "restore_window": True,
+              "confirm_exit": False,
+              "default_name": "",
+              "default_format": "None",
+              "default_expiration": "Never",
+              "default_exposure": "Public"}
+
 
 class PastebinGTK(Gtk.Window):
     """Create the application class."""
@@ -99,7 +120,7 @@ class PastebinGTK(Gtk.Window):
         # Variables for remembering user data.
         self.user_name = ""
         self.user_key = ""
-        self.dev_key = "d2314ff616133e54f728918b8af1500e"
+        self.dev_key = config["dev_key"]
         self.login = False
         
         # Initalize the PastebinPython object.
@@ -147,7 +168,7 @@ class PastebinGTK(Gtk.Window):
         # Create the Options menu.
         action_group.add_actions([
             ("options_menu", None, "_Options"),
-            ("options", None, "_Options...", "F2", None, None)
+            ("options", None, "_Options...", "F2", None, self.options)
         ])
         
         # Create the Help menu.
@@ -574,6 +595,44 @@ class PastebinGTK(Gtk.Window):
             
         # Close the dialog.
         open_dlg.destroy()
+    
+    
+    def options(self, event):
+        """Shows the Options dialog."""
+        
+        global config
+        
+        # Create the dialog.
+        opt_dlg = OptionsDialog(self, config)
+        
+        # Get the response.
+        response = opt_dlg.run()
+        
+        # If the user pressed OK:
+        if response == Gtk.ResponseType.OK:
+            
+            # Get the values.
+            login = opt_dlg.log_chk.get_active()
+            username = opt_dlg.user_chk.get_active()
+            restore_window = opt_dlg.win_chk.get_active()
+            confirm_exit = opt_dlg.exit_chk.get_active()
+            def_name = opt_dlg.name_ent.get_text()
+            def_format = opt_dlg.form_com.get_active_text()
+            def_expire = opt_dlg.expi_com.get_active_text()
+            def_expo = opt_dlg.expo_com.get_active_text()
+            
+            # Set the values.
+            config["prompt_login"] = login
+            config["remember_username"] = username
+            config["restore_window"] = restore_window
+            config["confirm_exit"] = confirm_exit
+            config["default_name"] = def_name
+            config["default_format"] = def_format
+            config["default_expiration"] = def_expire
+            config["default_exposure"] = def_expo
+        
+        # Close the dialog.
+        opt_dlg.destroy()
     
     
     def show_about(self, event):
