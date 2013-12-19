@@ -33,8 +33,6 @@ MENU_DATA = """
     </menu>
     <menu action="help_menu">
       <menuitem action="about" />
-      <separator />
-      <menuitem action="help" />
     </menu>
   </menubar>
   <toolbar name="toolbar">

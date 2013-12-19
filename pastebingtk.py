@@ -210,7 +210,6 @@ class PastebinGTK(Gtk.Window):
         action_group.add_actions([
             ("help_menu", None, "_Help"),
             ("about", None, "_About...", "<Shift>F1", None, self.show_about),
-            ("help", None, "_Help...", "F1", None, self.show_help)
         ])
         
         # Create the UI manager.
@@ -740,13 +739,6 @@ class PastebinGTK(Gtk.Window):
         
         # Show the dialog.
         about_dlg.show_all()
-    
-    
-    def show_help(self, event):
-        """Shows the help in a web browser."""
-        
-        # Open the help file.
-        webbrowser.open_new("resources/help/help.html")  
     
     
     def exit(self, x, y):
