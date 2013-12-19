@@ -49,6 +49,8 @@ import webbrowser
 import urllib2
 # Import time for working with time.
 import time
+# Import json for loading and saving the configuration file.
+import json
 
 # Tell Python not to create bytecode files, as they mess with the git repo.
 # This line can be removed be the user, if desired.
@@ -98,7 +100,7 @@ try:
     config = json.load(config_file)
     config_file.close()
 
-except IOError:
+except (IOError, ValueError):
     # Continue.
     config = {"dev_key": "d2314ff616133e54f728918b8af1500e",
               "prompt_login": True,
@@ -210,8 +212,9 @@ class PastebinGTK(Gtk.Window):
         self.add(grid)
         self.show_all()
         
-        # Get the user login details.
-        self.pastebin_login("ignore")
+        # Get the user login details, if they want that.
+        if config["prompt_login"]:
+            self.pastebin_login("ignore")
     
     
     def create_paste(self, event):
@@ -685,6 +688,31 @@ class PastebinGTK(Gtk.Window):
     
     def exit(self, x, y):
         """Closes the application."""
+        
+        # Confirm that the user wants to quit, if they want that.
+        if config["confirm_exit"]:
+            
+            conf_exit = show_question_dialog(self, "Exit", "Are you sure you want to exit?")
+            
+            if conf_exit != Gtk.ResponseType.OK:
+                return True
+        
+        # Save the configuration.
+        try:
+            # Save the configuration file.
+            config_file = open("%s/config" % main_dir, "w")
+            json.dump(config, config_file)
+            config_file.close()
+            
+        except IOError:
+            # Show the error message if something happened, but continue.
+            # This one is shown if there was an error writing to the file.
+            print("Error saving configuration file (IOError).")
+        
+        except (TypeError, ValueError):
+            # Show the error message if something happened, but continue.
+            # This one is shown if there was an error with the data type.
+            print("Error saving configuration file (TypeError or ValueError).")
         
         # Close the application.
         Gtk.main_quit()
