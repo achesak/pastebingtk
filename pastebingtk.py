@@ -112,6 +112,37 @@ except (IOError, ValueError):
               "default_expiration": "Never",
               "default_exposure": "Public"}
 
+# Load the last username, if the user wants that.
+if config["remember_username"]:
+    
+    try:
+        # Load the username.
+        user_file = open("%s/username" % main_dir, "r")
+        username = user_file.read()
+        user_file.close()
+    
+    except IOError:
+        # Continue.
+        username = ""
+
+# Get the previous window size.
+try:
+    # Load the window size file.
+    wins_file = open("%s/window_size" % main_dir, "r")
+    last_width = int(wins_file.readline())
+    last_height = int(wins_file.readline())
+    wins_file.close()
+
+except IOError:
+    # Continue.
+    last_width = 700
+    last_height = 500
+
+# If the user doesn't want to restore the window size, set the size to the default.
+if not config["restore_window"]:
+    last_width = 700
+    last_height = 500
+
 
 class PastebinGTK(Gtk.Window):
     """Create the application class."""
@@ -121,6 +152,8 @@ class PastebinGTK(Gtk.Window):
         
         # Variables for remembering user data.
         self.user_name = ""
+        if config["remember_username"]:
+            self.user_name = username
         self.user_key = ""
         self.dev_key = config["dev_key"]
         self.login = False
@@ -131,7 +164,7 @@ class PastebinGTK(Gtk.Window):
         # Create the window.
         Gtk.Window.__init__(self, title = TITLE)
         # Set the size.
-        self.set_default_size(700, 500)
+        self.set_default_size(last_width, last_height)
         # Set the icon.
         self.set_icon_from_file("resources/images/icon.png")
         
@@ -212,9 +245,30 @@ class PastebinGTK(Gtk.Window):
         self.add(grid)
         self.show_all()
         
+        # Bind the events.
+        self.connect("delete-event", self.delete_event)
+        
         # Get the user login details, if they want that.
         if config["prompt_login"]:
             self.pastebin_login("ignore")
+    
+    
+    def delete_event(self, widget, event):
+        """Saves the window size."""
+        
+        # Get the current window size.
+        height, width = self.get_size()
+        
+        # Save the window size.
+        try:
+            wins_file = open("%s/window_size" % main_dir, "w")
+            wins_file.write("%d\n%d" % (height, width))
+            wins_file.close()
+        
+        except IOError:
+            # Show the error message if something happened, but continue.
+            # This one is shown if there was an error writing to the file.
+            print("Error saving window size file (IOError).")
     
     
     def create_paste(self, event):
@@ -364,6 +418,8 @@ class PastebinGTK(Gtk.Window):
         
         # Show the dialog.
         login_dlg = LoginDialog(self)
+        if config["remember_username"]:
+            login_dlg.name_ent.set_text(self.user_name)
         response = login_dlg.run()
         
         # If the user clicked OK:
@@ -713,6 +769,20 @@ class PastebinGTK(Gtk.Window):
             # Show the error message if something happened, but continue.
             # This one is shown if there was an error with the data type.
             print("Error saving configuration file (TypeError or ValueError).")
+        
+        # Save the last username, if the user wants that.
+        if config["remember_username"]:
+            
+            try:
+                # Save the username.
+                user_file = open("%s/username" % main_dir, "w")
+                user_file.write(self.user_name)
+                user_file.close()
+            
+            except IOError:
+                # Show the error message if something happened, but continue.
+                # This one is shown if there was an error writing to the file.
+                print("Error saving username file (IOError).")
         
         # Close the application.
         Gtk.main_quit()
