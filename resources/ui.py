@@ -32,6 +32,8 @@ MENU_DATA = """
       <menuitem action="options" />
     </menu>
     <menu action="help_menu">
+      <menuitem action="help" />
+      <separator />
       <menuitem action="about" />
     </menu>
   </menubar>

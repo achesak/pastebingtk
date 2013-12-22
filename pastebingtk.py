@@ -209,6 +209,7 @@ class PastebinGTK(Gtk.Window):
         # Create the Help menu.
         action_group.add_actions([
             ("help_menu", None, "_Help"),
+            ("help", None, "_Help...", "F1", None, self.show_help),
             ("about", None, "_About...", "<Shift>F1", None, self.show_about),
         ])
         
@@ -698,6 +699,13 @@ class PastebinGTK(Gtk.Window):
         
         # Close the dialog.
         opt_dlg.destroy()
+    
+    
+    def show_help(self, event):
+        """Shows the help."""
+        
+        # Open the help in the user's web browser.
+        webbrowser.open("resources/help/help.html")
     
     
     def show_about(self, event):

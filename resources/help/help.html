@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    
+    <head>
+        
+        <meta charset="utf-8" />
+        
+        <link rel="stylesheet" type="text/css" href="help.css" />
+        
+        <title>PastebinGTK Help</title>
+        
+    </head>
+    
+    <body>
+        
+        <!-- Table of Contents -->
+        <div class="box2" id="toc">
+            
+            <h1>Table of Contents</h1>
+            
+            <ol>
+                <li><a href="#intro">Introduction</a></li>
+                <li><a href="#create">Creating a Paste</a></li>
+                <li><a href="#get">Getting a Paste</a></li>
+                <li><a href="#delete">Deleting a Paste</a></li>
+                <li><a href="#list">Getting Lists of Pastes</a></li>
+            </ol>
+            
+        </div>
+        
+        <!-- Introduction -->
+        <div class="box1" id="intro">
+        
+            <h1>1. Introduction</h1>
+        
+            <p>The first time you start PastebinGTK you will be presented with a basic interface that should look similar to this:</p>
+            
+            <p><img src="images/main_ui.png" /></p>
+        
+            <p>The main window appears along with a smaller login window. If you want to create pastes as a certain user then you need to log in first, but if you wish to create a paste anonymously then clicking the "Skip" button will close the window. If you want to log in later after already closing the window then simply open the "Pastebin" menu and choose "Login". If you want to logout later, choose "Logout" from the same menu.</p>
+        
+            <p class="top"><a href="#toc">(Back to top)</a></p>
+            
+        </div>
+        
+        <!-- Creating a Paste -->
+        <div class="box2" id="create">
+            
+            <h1>2. Creating a Paste</h1>
+            
+            <p>To create a new paste, choose "Create Paste" from the "Pastebin" menu or hit Ctrl+N. Doing so will open a window that allows you to choose options like the title, format (file type), expiration, and exposure for the paste.</p>
+            
+            <p><img src="images/new_paste1.png" /></p>
+            
+            <p>As an example, this image shows the PastebinGTK source code being uploaded, with the title of the paste set to "Source Code" and the format to Python source code. In addition, the paste will expire and be automatically deleted in one month, and in that time will be unlisted (available to everyone, but only if they have the direct link).</p>
+            
+            <p><img src="images/new_paste2.png" /></p>
+            
+            <p>If the paste is uploaded successfully then another window will appear with the direct link to the paste.</p>
+
+            <p><img src="images/new_paste3.png" /></p>
+            
+            <p class="top"><a href="#toc">(Back to top)</a></p>
+            
+        </div>
+        
+        <!-- Getting a Paste-->
+        <div class="box1" id="get">
+            
+            <h1>3. Getting a Paste</h1>
+            
+            <p>PastebinGTK can also retrieve existing pastes. Choosing the "Get Paste" item in the "Pastebin" menu, or pressing Ctrl+R, will cause this window will appear:</p>
+            
+            <p><img src="images/get_paste.png" /></p>
+            
+            <p>The paste key is the unique identifier for the paste. It is the part of the URL after the "http://pastebin.com". For example, in the link "http://pastebin.com/hFigP20P" the paste key is "hFigP20P".</p>
+            
+            <p class="top"><a href="#toc">(Back to top)</a></p>
+            
+        </div>
+        
+        <!-- Deleting a Paste -->
+        <div class="box2" id="delete">
+            
+            <h1>4. Deleting a Paste</h1>
+            
+            <p>PastebinGTK allows you to delete pastes that you no longer want. Note that this requires you to be logged in to the account that created the paste. Anonymous pastes cannot be deleted.</p>
+            
+            <p>To delete a paste, select "Delete Paste" from the "Pastebin" menu or press Ctrl+D.</p>
+            
+            <p><img src="images/delete_paste.png" /></p>
+            
+            <p>See the section on <a href="#get">getting pastes</a> for information on the paste key.</p>
+            
+            <p class="top"><a href="#toc">(Back to top)</a></p>
+            
+        </div>
+        
+        <!-- Getting Lists of Pastes -->
+        <div class="box1" id="list">
+            
+            <h1>5. Getting Lists of Pastes</h1>
+            
+            <p>PastebinGTK can also display lists of trending pastes and user's pastes.</p>
+            
+            <p>Trending pastes are the current popular pastes. They can be shown by selecting "List Trending Pastes" from the "Pastebin" menu or by pressing Ctrl+T.</p>
+            
+            <p><img src="images/list_trending.png" /></p>
+
+            <p>It is also possible to list a user's pastes by choosing "List User's Pastes". Note that this requires the user to be currently logged in.</p>
+            
+            <p><img src="images/list_user.png" /></p>
+            
+            <p class="top"><a href="#toc">(Back to top)</a></p>
+            
+        </div>
+        
+    </body>
+
+</html>
