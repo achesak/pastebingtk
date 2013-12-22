@@ -20,8 +20,8 @@ class LoginDialog(Gtk.Dialog):
         self.set_resizable(False)
         
         # Add the buttons.
-        self.add_button("Cancel", Gtk.ResponseType.CANCEL)
-        self.add_button("OK", Gtk.ResponseType.OK)
+        self.add_button("Skip", Gtk.ResponseType.CANCEL)
+        self.add_button("Login", Gtk.ResponseType.OK)
         
         # Create the grid.
         new_box = self.get_content_area()
