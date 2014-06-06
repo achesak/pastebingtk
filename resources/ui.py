@@ -23,10 +23,11 @@ MENU_DATA = """
       <menuitem action="login" />
       <menuitem action="logout" />
       <separator />
+      <menuitem action="quit" />
+    </menu>
+    <menu action="text_menu">
       <menuitem action="save" />
       <menuitem action="open" />
-      <separator />
-      <menuitem action="quit" />
     </menu>
     <menu action="options_menu">
       <menuitem action="options" />
