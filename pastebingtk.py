@@ -372,8 +372,8 @@ class PastebinGTK(Gtk.Window):
         
         try:
             
-            # Run the function to get the list of pastes, for whatever reason.
-            self.api.listUserPastes()
+            # Get the list of the user's pastes.
+            pastes = self.api.listUserPastes()
         
         except PastebinNoPastesException:
             
@@ -381,43 +381,70 @@ class PastebinGTK(Gtk.Window):
             show_alert_dialog(self, "Delete Paste", "The currently logged in user has no pastes.")
             return
         
+        except urllib2.URLError:
+            
+            show_error_dialog(self, "List User's Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
+        # Create the list of data.
+        data = []
+        
+        # Loop through the pastes and add the data.
+        for i in pastes:
+            
+            new = []
+            new.append(i["paste_title"])
+            new.append(i["paste_key"])
+            new.append(i["paste_format_long"])
+            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
+            data.append(new)
+        
         # Show the dialog.
-        del_dlg = DeletePasteDialog(self)
+        del_dlg = DeletePasteDialog(self, data)
         response = del_dlg.run()
         
-        # If the user pressed OK:
-        if response == Gtk.ResponseType.OK:
-            
-            # Get the key.
-            key = del_dlg.key_ent.get_text()
-            
-            try:
-                
-                # Get the paste.
-                paste = self.api.deletePaste(api_paste_key = key)
-            
-            except urllib2.URLError:
-                
-                # Show an error if the paste could not be deleted. This will occur if the user isn't connected to the internet.
-                show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
-            
-            except PastebinHTTPErrorException:
-                
-                # Show an error if the paste could not be deleted. This will occur if the key is invalid.
-                show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that an invalid paste key was specifed.")
-                
-            else:
-                
-                if paste == True:
-                    
-                    show_alert_dialog(self, "Delete Paste", "Paste was successfully deleted.")
-                
-                else:
-                    
-                    show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
-            
+        # Get the selected item.
+        model, treeiter = del_dlg.treeview.get_selection().get_selected()
+        
         # Close the dialog.
         del_dlg.destroy()
+        
+        # If the user did not press OK, don't continue.
+        if response != Gtk.ResponseType.OK:
+            return
+        
+        # If nothing was selected, don't continue.
+        if treeiter == None:
+            return
+        
+        # Get the name and key.
+        paste_name = model[treeiter][0]
+        key = model[treeiter][1]
+        
+        try:
+            
+            # Get the paste.
+            paste = self.api.deletePaste(api_paste_key = key)
+        
+        except urllib2.URLError:
+            
+            # Show an error if the paste could not be deleted. This will occur if the user isn't connected to the internet.
+            show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+        
+        except PastebinHTTPErrorException:
+            
+            # Show an error if the paste could not be deleted. This will occur if the key is invalid.
+            show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that an invalid paste key was specifed.")
+            
+        else:
+            
+            if paste == True:
+                
+                show_alert_dialog(self, "Delete Paste", "%s was successfully deleted." % ("Paste \"%s\"" % paste_name if paste_name != "" else "Untitled paste"))
+            
+            else:
+                
+                show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
     
     
     def pastebin_login(self, event):
