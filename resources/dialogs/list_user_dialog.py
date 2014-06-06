@@ -18,6 +18,7 @@ class ListPastesDialog(Gtk.Dialog):
         self.set_default_size(950, 300)
         
         # Add the buttons.
+        self.add_button("Get Paste", 9)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
         # Create the ListStore for storing the data.

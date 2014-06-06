@@ -324,42 +324,44 @@ class PastebinGTK(Gtk.Window):
         new_dlg.destroy()
     
     
-    def get_paste(self, event):
+    def get_paste(self, event, key = ""):
         """Gets an existing paste."""
         
-        # Show the dialog.
-        get_dlg = GetPasteDialog(self)
-        response = get_dlg.run()
+        # If the key hasn't been specified, prompt the user.
+        if not key:
         
-        # If the user clicked OK:
-        if response == Gtk.ResponseType.OK:
+            # Show the dialog.
+            get_dlg = GetPasteDialog(self)
+            response = get_dlg.run()
             
             # Get the key.
             key = get_dlg.key_ent.get_text()
             
-            try:
-                
-                # Get the paste.
-                paste = self.api.getPasteRawOutput(api_paste_key = key)
+            # Close the dialog.
+            get_dlg.destroy()
+        
+            # If the user did not click OK, don't continue.
+            if response != Gtk.ResponseType.OK:
+                return
+        
+        try:
+            # Get the paste.
+            paste = self.api.getPasteRawOutput(api_paste_key = key)
+        
+        except urllib2.URLError:
+            # Show an error if the paste could not be retrieved. This will occur if the user isn't connected to the internet.
+            show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+        
+        except PastebinHTTPErrorException:
+            # Show an error if the paste could not be retreived. This will occur if the key is invalid.
+            show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste key was specifed.")
             
-            except urllib2.URLError:
-                
-                # Show an error if the paste could not be retrieved. This will occur if the user isn't connected to the internet.
-                show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+        else:
+            # Delete the current text and insert the new.
+            self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
+            self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
             
-            except PastebinHTTPErrorException:
-                
-                # Show an error if the paste could not be retreived. This will occur if the key is invalid.
-                show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste key was specifed.")
-                
-            else:
-                
-                # Delete the current text and insert the new.
-                self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
-                self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
-            
-        # Close the dialog.
-        get_dlg.destroy()
+        
     
     
     def delete_paste(self, event):
@@ -439,11 +441,9 @@ class PastebinGTK(Gtk.Window):
         else:
             
             if paste == True:
-                
                 show_alert_dialog(self, "Delete Paste", "%s was successfully deleted." % ("Paste \"%s\"" % paste_name if paste_name != "" else "Untitled paste"))
             
             else:
-                
                 show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
     
     
@@ -468,17 +468,14 @@ class PastebinGTK(Gtk.Window):
                     self.user_key = self.api.createAPIUserKey(user_name, password)
                     self.user_name = user_name
                     self.login = True
-                    
                     self.status_lbl.set_text("Logged in as %s" % user_name)
                     show_alert_dialog(self, "Login", "Successfully logged in as %s." % user_name)
                 
                 except PastebinBadRequestException:
-                    
                     show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
                     self.login = False
                 
                 except urllib2.URLError:
-                    
                     show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
                     self.login = False
             
@@ -558,12 +555,28 @@ class PastebinGTK(Gtk.Window):
             
             data.append(new)
         
-        # Create and the dialog.
+        # Create the dialog and get the response.
         list_dlg = ListPastesDialog(self, "%s's Pastes" % self.user_name, data)
-        list_dlg.run()
+        response = list_dlg.run()
+        
+        # Get the selected item.
+        model, treeiter = list_dlg.treeview.get_selection().get_selected()
         
         # Close the dialog.
         list_dlg.destroy()
+        
+        # If the user clicked "Get Paste", load the selected paste.
+        if response == 9:
+            
+            # If nothing was selected, don't continue.
+            if treeiter == None:
+                return
+            
+            # Get the key.
+            key = model[treeiter][1]
+            
+            # Load the paste.
+            self.get_paste(event = None, key = key)
     
     
     def list_trending_pastes(self, event):
@@ -615,12 +628,28 @@ class PastebinGTK(Gtk.Window):
             
             data.append(new)
         
-        # Create and the dialog.
+        # Create the dialog and get the response.
         list_dlg = ListPastesDialog(self, "Currently Trending Pastes", data)
-        list_dlg.run()
+        response = list_dlg.run()
+        
+        # Get the selected item.
+        model, treeiter = list_dlg.treeview.get_selection().get_selected()
         
         # Close the dialog.
         list_dlg.destroy()
+        
+        # If the user clicked "Get Paste", load the selected paste.
+        if response == 9:
+            
+            # If nothing was selected, don't continue.
+            if treeiter == None:
+                return
+            
+            # Get the key.
+            key = model[treeiter][1]
+            
+            # Load the paste.
+            self.get_paste(event = None, key = key)
     
     
     def save_file(self, event):
