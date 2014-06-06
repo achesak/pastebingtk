@@ -37,7 +37,7 @@ THE SOFTWARE.
 # Import any needed modules.
 # Import Gtk and Gdk for the interface.
 from gi.repository import Gtk, Gdk, GdkPixbuf
-# Import sys for closing the application.
+# Import sys for closing the application and getting command line arguments.
 import sys
 # Import os for various things.
 import os
@@ -80,6 +80,8 @@ from resources.pastebin_python.pastebin import PastebinPython
 from resources.pastebin_python.pastebin_exceptions import PastebinBadRequestException, PastebinFileException, PastebinHTTPErrorException, PastebinNoPastesException
 # Import the API options.
 from resources.pastebin_python.pastebin_options import OPTION_DELETE, OPTION_LIST, OPTION_PASTE, OPTION_TRENDS, OPTION_USER_DETAILS
+# Import the functions for working with command line arguments.
+import resources.command_line as command_line
 
 # Get the main directory.
 if platform.system().lower() == "windows":
@@ -856,10 +858,36 @@ class PastebinGTK(Gtk.Window):
         Gtk.main_quit()
 
 
-if  __name__ == "__main__":
+# If there are no parameters, show the GUI.
+if  __name__ == "__main__" and len(sys.argv) == 1:
     
     # Create the application.
     win = PastebinGTK()
     win.connect("delete-event", win.exit)
     win.show_all()
     Gtk.main()
+
+# If there are parameters specified, run the application from the command line.
+elif __name__ == "__main__" and len(sys.argv) > 1:
+    
+    # Make sure the usage is correct.
+    if len(sys.argv) < 3:
+        print("Usage: pastebincl [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
+        sys.exit()
+    
+    # Uploading text:
+    if sys.argv[1] == "upload" or sys.argv[1] == "uploadfile":
+        url = command_line.upload(sys.argv, config["dev_key"])
+        print("Paste uploaded: %s" % url)
+    
+    # Downloading text:
+    elif sys.argv[1] == "download" or sys.argv[1] == "downloadfile":
+        text = command_line.download(sys.argv, config["dev_key"])
+        if sys.argv[1] == "download":
+            print(text)
+        else:
+            open(sys.argv[3], "w").write(text)
+    
+    # Other command:
+    else:
+        print("Usage: pastebincl [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
