@@ -195,8 +195,9 @@ class PastebinGTK(Gtk.Window):
             ("delete_paste", Gtk.STOCK_DELETE, "_Delete Paste...", "<Control>d", "Delete a paste", self.delete_paste),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, self.list_trending_pastes),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, self.list_users_pastes),
+            ("get_user_data", None, "Get User's D_ata...", "<Control>i", None, None),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
-            ("logout", None, "Logo_ut...", "<Shift><Control>1", None, self.pastebin_logout),
+            ("logout", None, "Logo_ut...", "<Shift><Control>l", None, self.pastebin_logout),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
         ])
         

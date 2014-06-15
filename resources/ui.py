@@ -20,6 +20,8 @@ MENU_DATA = """
       <menuitem action="list_trending_pastes" />
       <menuitem action="list_users_pastes" />
       <separator />
+      <menuitem action="get_user_data" />
+      <separator />
       <menuitem action="login" />
       <menuitem action="logout" />
       <separator />
