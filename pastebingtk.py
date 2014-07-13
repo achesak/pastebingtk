@@ -4,7 +4,7 @@
 ################################################################################
 
 # PastebinGTK
-# Version 0.2
+# Version 0.3
 
 # PastebinGTK is a desktop client for pastebin.com.
 
@@ -195,7 +195,6 @@ class PastebinGTK(Gtk.Window):
             ("delete_paste", Gtk.STOCK_DELETE, "_Delete Paste...", "<Control>d", "Delete a paste", self.delete_paste),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, self.list_trending_pastes),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, self.list_users_pastes),
-            ("get_user_data", None, "Get User's D_ata...", "<Control>i", None, None),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut...", "<Shift><Control>l", None, self.pastebin_logout),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
@@ -369,8 +368,6 @@ class PastebinGTK(Gtk.Window):
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
             
-        
-    
     
     def delete_paste(self, event):
         """Deletes an existing paste."""
@@ -658,6 +655,12 @@ class PastebinGTK(Gtk.Window):
             
             # Load the paste.
             self.get_paste(event = None, key = key)
+    
+    
+    def get_users_data(self, event):
+        """Gets the user's information and settings."""
+        
+        print("Not yet implemented!")
     
     
     def save_file(self, event):
