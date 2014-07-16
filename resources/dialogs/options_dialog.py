@@ -94,12 +94,40 @@ class OptionsDialog(Gtk.Dialog):
         self.expo_com.set_active(["Public", "Unlisted", "Private"].index(config["default_exposure"]))
         opt_grid2.attach_next_to(self.expo_com, expo_lbl, Gtk.PositionType.RIGHT, 1, 1)
         
+        # Create the third grid.
+        opt_grid3 = Gtk.Grid()
+        opt_grid3_lbl = Gtk.Label("Editing")
+        
+        # Create the show line numbers checkbox.
+        self.lin_chk = Gtk.CheckButton("Show line numbers")
+        self.lin_chk.set_active(config["line_numbers"])
+        opt_grid3.attach(self.lin_chk, 0, 0, 2, 1)
+        
+        # Create the enable syntax highlighting checkbox.
+        self.syn_chk = Gtk.CheckButton("Enable syntax highlighting")
+        self.syn_chk.set_active(config["syntax_highlight"])
+        opt_grid3.attach_next_to(self.syn_chk, self.lin_chk, Gtk.PositionType.BOTTOM, 2, 1)
+        
+        # Create the automatically guess language checkbox.
+        self.asyn_chk = Gtk.CheckButton("Automatically guess language")
+        self.asyn_chk.set_active(config["syntax_guess"])
+        opt_grid3.attach_next_to(self.asyn_chk, self.syn_chk, Gtk.PositionType.BOTTOM, 2, 1)
+        
+        # Create the default syntax highlighting label and entry.
+        dsyn_lbl = Gtk.Label("Default syntax highlighting: ")
+        dsyn_lbl.set_alignment(0, 0.5)
+        opt_grid3.attach_next_to(dsyn_lbl, self.asyn_chk, Gtk.PositionType.BOTTOM, 1, 1)
+        self.dsyn_ent = Gtk.Entry()
+        self.dsyn_ent.set_text(config["syntax_default"])
+        opt_grid3.attach_next_to(self.dsyn_ent, dsyn_lbl, Gtk.PositionType.RIGHT, 1, 1)
+        
         # Add the notebook.
         opt_box.add(notebook)
         
         # Add the tabs to the notebook.
         notebook.append_page(opt_grid1, opt_grid1_lbl)
         notebook.append_page(opt_grid2, opt_grid2_lbl)
+        notebook.append_page(opt_grid3, opt_grid3_lbl)
         
         # Show the dialog. The response gets handled by the function
         # in the main class.

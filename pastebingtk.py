@@ -114,7 +114,21 @@ except (IOError, ValueError):
               "default_name": "",
               "default_format": "None",
               "default_expiration": "Never",
-              "default_exposure": "Public"}
+              "default_exposure": "Public",
+              "line_numbers": True,
+              "syntax_highlight": True,
+              "syntax_guess": True,
+              "syntax_default": ""}
+
+# Update the configuration, if necessary.
+if not "line_numbers" in config:
+    config["line_numbers"] = True
+if not "syntax_highlight" in config:
+    config["syntax_highlight"] = True
+if not "syntax_guess" in config:
+    config["syntax_guess"] = True
+if not "syntax_default" in config:
+    config["syntax_default"] = ""
 
 # Load the last username, if the user wants that.
 if config["remember_username"]:
