@@ -198,8 +198,9 @@ class PastebinGTK(Gtk.Window):
         self.language_manager = GtkSource.LanguageManager.new()
         self.text_buffer = self.text_view.get_buffer()
         
-        # Show line numbers.
-        self.text_view.set_show_line_numbers(True)
+        # Show line numbers, if the user wants that.
+        if config["line_numbers"]:
+            self.text_view.set_show_line_numbers(True)
         
         # Add the text box to the scrolled window.
         scrolled_window.add(self.text_view)
@@ -776,6 +777,10 @@ class PastebinGTK(Gtk.Window):
             def_format = opt_dlg.form_com.get_active_text()
             def_expire = opt_dlg.expi_com.get_active_text()
             def_expo = opt_dlg.expo_com.get_active_text()
+            line_num = opt_dlg.lin_chk.get_active()
+            syntax = opt_dlg.syn_chk.get_active()
+            syntax_guess = opt_dlg.asyn_chk.get_active()
+            syntax_def = opt_dlg.dsyn_ent.get_text()
             
             # Set the values.
             config["prompt_login"] = login
@@ -786,6 +791,13 @@ class PastebinGTK(Gtk.Window):
             config["default_format"] = def_format
             config["default_expiration"] = def_expire
             config["default_exposure"] = def_expo
+            config["line_numbers"] = line_num
+            config["syntax_highlight"] = syntax
+            config["syntax_guess"] = syntax_guess
+            config["syntax_default"] = syntax_def
+            
+            # Update anything that could have changed.
+            self.text_view.set_show_line_numbers(line_num)
         
         # Close the dialog.
         opt_dlg.destroy()
