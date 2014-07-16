@@ -37,6 +37,8 @@ THE SOFTWARE.
 # Import any needed modules.
 # Import Gtk and Gdk for the interface.
 from gi.repository import Gtk, Gdk, GdkPixbuf
+# Import GtkSource for the sourceview widget.
+from gi.repository import GtkSource
 # Import sys for closing the application and getting command line arguments.
 import sys
 # Import os for various things.
@@ -177,9 +179,13 @@ class PastebinGTK(Gtk.Window):
         scrolled_window.set_hexpand(True)
         scrolled_window.set_vexpand(True)
         
-        # Create the text box.
-        self.text_view = Gtk.TextView()
+        # Create the sourceview.
+        self.text_view = GtkSource.View.new()
+        self.language_manager = GtkSource.LanguageManager.new()
         self.text_buffer = self.text_view.get_buffer()
+        
+        # Show line numbers.
+        self.text_view.set_show_line_numbers(True)
         
         # Add the text box to the scrolled window.
         scrolled_window.add(self.text_view)
@@ -367,6 +373,9 @@ class PastebinGTK(Gtk.Window):
             # Delete the current text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
+            
+            # Set the cursor to the beginning of the sourceview.
+            self.text_buffer.place_cursor(self.text_buffer.get_start_iter())
             
     
     def delete_paste(self, event):
