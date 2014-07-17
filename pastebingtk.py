@@ -804,6 +804,7 @@ class PastebinGTK(Gtk.Window):
             syntax = opt_dlg.syn_chk.get_active()
             syntax_guess = opt_dlg.asyn_chk.get_active()
             syntax_def = opt_dlg.dsyn_ent.get_text()
+            dev_key = opt_dlg.devk_ent.get_text()
             
             # Set the values.
             config["prompt_login"] = login
@@ -818,6 +819,7 @@ class PastebinGTK(Gtk.Window):
             config["syntax_highlight"] = syntax
             config["syntax_guess"] = syntax_guess
             config["syntax_default"] = syntax_def
+            config["dev_key"] = dev_key
             
             # Update anything that could have changed.
             self.text_view.set_show_line_numbers(line_num)

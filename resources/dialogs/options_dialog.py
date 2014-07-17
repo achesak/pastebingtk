@@ -125,6 +125,18 @@ class OptionsDialog(Gtk.Dialog):
         opt_grid4 = Gtk.Grid()
         opt_grid4_lbl = Gtk.Label("Technical")
         
+        # Create the developer key label and entry.
+        devk_lbl = Gtk.Label("Developer key: ")
+        devk_lbl.set_alignment(0, 0.5)
+        opt_grid4.attach(devk_lbl, 0, 0, 1, 1)
+        self.devk_ent = Gtk.Entry()
+        self.devk_ent.set_text(config["dev_key"])
+        opt_grid4.attach_next_to(self.devk_ent, devk_lbl, Gtk.PositionType.RIGHT, 1, 1)
+        
+        # Create the developer key description label.
+        devk_desc_lbl = Gtk.Label("Please add your own developer key to\nprevent limits to the number of pastes that\ncan be created.\nThank you.")
+        opt_grid4.attach_next_to(devk_desc_lbl, devk_lbl, Gtk.PositionType.BOTTOM, 2, 1)
+        
         # Add the notebook.
         opt_box.add(notebook)
         
@@ -132,6 +144,7 @@ class OptionsDialog(Gtk.Dialog):
         notebook.append_page(opt_grid1, opt_grid1_lbl)
         notebook.append_page(opt_grid2, opt_grid2_lbl)
         notebook.append_page(opt_grid3, opt_grid3_lbl)
+        notebook.append_page(opt_grid4, opt_grid4_lbl)
         
         # Show the dialog. The response gets handled by the function
         # in the main class.
