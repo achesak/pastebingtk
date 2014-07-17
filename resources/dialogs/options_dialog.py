@@ -104,22 +104,26 @@ class OptionsDialog(Gtk.Dialog):
         opt_grid3.attach(self.lin_chk, 0, 0, 2, 1)
         
         # Create the enable syntax highlighting checkbox.
-        self.syn_chk = Gtk.CheckButton("Enable syntax highlighting")
-        self.syn_chk.set_active(config["syntax_highlight"])
-        opt_grid3.attach_next_to(self.syn_chk, self.lin_chk, Gtk.PositionType.BOTTOM, 2, 1)
+        #self.syn_chk = Gtk.CheckButton("Enable syntax highlighting")
+        #self.syn_chk.set_active(config["syntax_highlight"])
+        #opt_grid3.attach_next_to(self.syn_chk, self.lin_chk, Gtk.PositionType.BOTTOM, 2, 1)
         
         # Create the automatically guess language checkbox.
-        self.asyn_chk = Gtk.CheckButton("Automatically guess language")
-        self.asyn_chk.set_active(config["syntax_guess"])
-        opt_grid3.attach_next_to(self.asyn_chk, self.syn_chk, Gtk.PositionType.BOTTOM, 2, 1)
+        #self.asyn_chk = Gtk.CheckButton("Automatically guess language")
+        #self.asyn_chk.set_active(config["syntax_guess"])
+        #opt_grid3.attach_next_to(self.asyn_chk, self.syn_chk, Gtk.PositionType.BOTTOM, 2, 1)
         
         # Create the default syntax highlighting label and entry.
-        dsyn_lbl = Gtk.Label("Default syntax highlighting: ")
-        dsyn_lbl.set_alignment(0, 0.5)
-        opt_grid3.attach_next_to(dsyn_lbl, self.asyn_chk, Gtk.PositionType.BOTTOM, 1, 1)
-        self.dsyn_ent = Gtk.Entry()
-        self.dsyn_ent.set_text(config["syntax_default"])
-        opt_grid3.attach_next_to(self.dsyn_ent, dsyn_lbl, Gtk.PositionType.RIGHT, 1, 1)
+        #dsyn_lbl = Gtk.Label("Default syntax highlighting: ")
+        #dsyn_lbl.set_alignment(0, 0.5)
+        #opt_grid3.attach_next_to(dsyn_lbl, self.asyn_chk, Gtk.PositionType.BOTTOM, 1, 1)
+        #self.dsyn_ent = Gtk.Entry()
+        #self.dsyn_ent.set_text(config["syntax_default"])
+        #opt_grid3.attach_next_to(self.dsyn_ent, dsyn_lbl, Gtk.PositionType.RIGHT, 1, 1)
+        
+        # Create the fourth grid.
+        opt_grid4 = Gtk.Grid()
+        opt_grid4_lbl = Gtk.Label("Technical")
         
         # Add the notebook.
         opt_box.add(notebook)

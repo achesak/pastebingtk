@@ -385,12 +385,35 @@ class PastebinGTK(Gtk.Window):
             show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste key was specifed.")
             
         else:
+            
             # Delete the current text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
             
             # Set the cursor to the beginning of the sourceview.
             self.text_buffer.place_cursor(self.text_buffer.get_start_iter())
+            
+            # Guess the language, if the user wants that.
+            if config["syntax_highlight"] and config["syntax_guess"]:
+                pass
+                
+                # THIS IS A WORKAROUND WHERE IT REQUIRES A FILE TO DETECT A LANGUAGE
+                # TODO: MAKE THIS NO LONGER REQUIRE A FILE
+                
+                # Create the temporary file.
+                #temp_file = open("pastebingtk.temp", "w")
+                #temp_file.write(paste)
+                #temp_file.close()
+                
+                # Guess and set the language.
+                #language = self.language_manager.guess_language("pastebingtk.temp", None)
+                #print self.language_manager.get_language_ids()
+                #print language
+                #self.text_buffer.set_highlight_syntax(True)
+                #self.text_buffer.set_language("python")
+                
+                # Cleanup the temporary file.
+                #os.remove("pastebingtk.temp")
             
     
     def delete_paste(self, event):
