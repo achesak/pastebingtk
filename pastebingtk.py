@@ -70,8 +70,10 @@ from resources.dialogs.create_dialog import CreatePasteDialog
 from resources.dialogs.get_dialog import GetPasteDialog
 # Import the delete paste dialog.
 from resources.dialogs.delete_dialog import DeletePasteDialog
-# Import the list dialog.
+# Import the paste list dialog.
 from resources.dialogs.list_user_dialog import ListPastesDialog
+# Import the user details dialog.
+from resources.dialogs.user_details_dialog import UserDetailsDialog
 # Import the options dialog.
 from resources.dialogs.options_dialog import OptionsDialog
 # Import the miscellaneous dialogs.
@@ -218,6 +220,7 @@ class PastebinGTK(Gtk.Window):
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, self.list_users_pastes),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut...", "<Shift><Control>l", None, self.pastebin_logout),
+            ("user_details", None, "G_et User's Details...", None, None, self.get_user_details),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
         ])
         
@@ -704,8 +707,32 @@ class PastebinGTK(Gtk.Window):
             self.get_paste(event = None, key = key)
     
     
-    def get_users_data(self, event):
+    def get_user_details(self, event):
         """Gets the user's information and settings."""
+        
+        # The user must be logged in to do this.
+        if not self.login:
+            show_error_dialog(self, "Get User's Details", "Must be logged in to view a user's details.")
+            return
+        
+        try:
+            
+            # Run the function to get the user's details
+            info = self.api.getUserInfos()
+        
+        except urllib2.URLError:
+            
+            show_error_dialog(self, "Get User's Details", "Details could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
+        data = self.api.getUserInfos()
+        
+        # Create the dialog and get the response.
+        user_dlg = UserDetailsDialog(self, "%s's User Details" % self.user_name, data)
+        response = user_dlg.run()
+        
+        # Close the dialog.
+        user_dlg.destroy()
         
         print("Not yet implemented!")
     
