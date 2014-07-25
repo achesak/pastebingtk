@@ -4,7 +4,7 @@
 ################################################################################
 
 # PastebinGTK
-# Version 0.3
+# Version 1.0
 
 # PastebinGTK is a desktop client for pastebin.com.
 
