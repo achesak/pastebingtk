@@ -18,7 +18,7 @@ class UserDetailsDialog(Gtk.Dialog):
         self.set_default_size(400, 300)
         
         # Add the buttons.
-        self.add_button("Open Profile", 9)
+        self.add_button("View Profile", 9)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
         # Create the ListStore for storing the data.
