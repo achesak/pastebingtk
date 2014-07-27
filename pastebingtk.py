@@ -109,7 +109,7 @@ try:
     config_file.close()
 
 except (IOError, ValueError):
-    # Continue.
+    # Set the defaults and continue.
     config = {"dev_key": "d2314ff616133e54f728918b8af1500e",
               "prompt_login": True,
               "remember_username": True,
@@ -122,7 +122,8 @@ except (IOError, ValueError):
               "line_numbers": True,
               "syntax_highlight": True,
               "syntax_guess": True,
-              "syntax_default": ""}
+              "syntax_default": "",
+              "check_spam": True}
 
 # Update the configuration, if necessary.
 if not "line_numbers" in config:
@@ -133,6 +134,8 @@ if not "syntax_guess" in config:
     config["syntax_guess"] = True
 if not "syntax_default" in config:
     config["syntax_default"] = ""
+if not "check_spam" in config:
+    config["check_spam"] = True
 
 # Load the last username, if the user wants that.
 if config["remember_username"]:
@@ -326,35 +329,56 @@ class PastebinGTK(Gtk.Window):
         
         response = new_dlg.run()
         
+        # Get the fields.
+        name = new_dlg.name_ent.get_text()
+        format_ = new_dlg.form_com.get_active_text()
+        expire = new_dlg.expi_com.get_active_text()
+        exposure = new_dlg.expo_com.get_active_text()
+        
+        # Get the values as needed.
+        format_ = FORMATS[format_]
+        expire = EXPIRE[expire]
+        exposure = EXPOSURE[exposure]
+        
+        # Close the dialog.
+        new_dlg.destroy()
+        
         # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
-            
-            # Get the fields.
-            name = new_dlg.name_ent.get_text()
-            format_ = new_dlg.form_com.get_active_text()
-            expire = new_dlg.expi_com.get_active_text()
-            exposure = new_dlg.expo_com.get_active_text()
-            
-            # Get the values as needed.
-            format_ = FORMATS[format_]
-            expire = EXPIRE[expire]
-            exposure = EXPOSURE[exposure]
             
             try:
                 
                 # Send the paste.
                 url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
                 
+                # Check for the spam filter, if the user wants that.
+                caught_spam = False
+                if config["check_spam"]:
+                    
+                    try:
+                        # Get the paste.
+                        paste = self.api.getPasteRawOutput(api_paste_key = url.rsplit("/", 1)[-1])
+                
+                    except urllib2.URLError:
+                        pass # Shouldn't happen, unless the user is an idiot and disconnects from the internet 
+                             # sometime between uploading the paste and now.
+                    
+                    else:
+                        # Check if the paste doesn't match.
+                        if paste != text:
+                            caught_spam = True
+                
+                
                 # Show the url.
-                show_alert_dialog(self, "Create Paste", "Paste has been successfully created, and can be found at the following URL:\n\n%s" % url)
+                if not caught_spam:
+                    show_alert_dialog(self, "Create Paste", "Paste has been successfully created, and can be found at the following URL:\n\n%s" % url)
+                else:
+                    show_alert_dialog(self, "Create Paste", "Paste triggered automatic spam detection filter. Verify that you are not a bot by filling out the captcha at the following URL:\n\n%s" % url)
             
             except urllib2.URLError:
                 
                 # Show an error if the paste could not be sent. This will occur if the user isn't connected to the internet.
                 show_error_dialog(self, "Create Paste", "Paste could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
-        
-        # Close the dialog.
-        new_dlg.destroy()
     
     
     def get_paste(self, event, key = ""):
@@ -423,7 +447,7 @@ class PastebinGTK(Gtk.Window):
                 
                 # Cleanup the temporary file.
                 #os.remove("pastebingtk.temp")
-            
+        
     
     def delete_paste(self, event):
         """Deletes an existing paste."""
@@ -846,6 +870,7 @@ class PastebinGTK(Gtk.Window):
             username = opt_dlg.user_chk.get_active()
             restore_window = opt_dlg.win_chk.get_active()
             confirm_exit = opt_dlg.exit_chk.get_active()
+            check_spam = opt_dlg.spam_chk.get_active()
             def_name = opt_dlg.name_ent.get_text()
             def_format = opt_dlg.form_com.get_active_text()
             def_expire = opt_dlg.expi_com.get_active_text()
@@ -861,6 +886,7 @@ class PastebinGTK(Gtk.Window):
             config["remember_username"] = username
             config["restore_window"] = restore_window
             config["confirm_exit"] = confirm_exit
+            config["check_spam"] = check_spam
             config["default_name"] = def_name
             config["default_format"] = def_format
             config["default_expiration"] = def_expire

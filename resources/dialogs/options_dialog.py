@@ -52,6 +52,11 @@ class OptionsDialog(Gtk.Dialog):
         self.exit_chk.set_active(config["confirm_exit"])
         opt_grid1.attach_next_to(self.exit_chk, self.win_chk, Gtk.PositionType.BOTTOM, 2, 1)
         
+        # Create the check for spam filter checkbox.
+        self.spam_chk = Gtk.CheckButton("Check for spam filter")
+        self.spam_chk.set_active(config["check_spam"])
+        opt_grid1.attach_next_to(self.spam_chk, self.exit_chk, Gtk.PositionType.BOTTOM, 2, 1)
+        
         # Create the second grid.
         opt_grid2 = Gtk.Grid()
         opt_grid2_lbl = Gtk.Label("Defaults")
