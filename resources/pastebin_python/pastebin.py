@@ -226,7 +226,9 @@ class PastebinPython(object):
         :returns: list -- user info in a dictionary format
 
         """
-        retList = {}
+        exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
+        expiration = {"N": "Never", "10M": "10 Minutes", "1H": "1 Hour", "1D": "1 Day", "1W": "1 Week", "2W": "2 Weeks", "1M": "1 Month"}
+        retList = []
         userElements = xmlString.getElementsByTagName('user')
         
         # Edited to get around a bug where not having one of these fields for the user causes a crash.
@@ -234,43 +236,46 @@ class PastebinPython(object):
         # it could be done.
         
         try:
-            retList["Username"] = userElements[0].getElementsByTagName("user_name")[0].childNodes[0].nodeValue
+            retList.append(["Username", userElements[0].getElementsByTagName("user_name")[0].childNodes[0].nodeValue])
         except IndexError:
             pass
         try:
-            retList["User URL"] = "http://pastebin.com/u/" + retList["Username"]
+            retList.append(["User URL", "http://pastebin.com/u/" + retList[0][1]])
         except IndexError:
             pass
         try:
-            retList["Email"] = userElements[0].getElementsByTagName("user_email")[0].childNodes[0].nodeValue
+            retList.append(["Email", userElements[0].getElementsByTagName("user_email")[0].childNodes[0].nodeValue])
         except IndexError:
             pass
         try:
-            retList["Website"] = userElements[0].getElementsByTagName("user_website")[0].childNodes[0].nodeValue
+            retList.append(["Website", userElements[0].getElementsByTagName("user_website")[0].childNodes[0].nodeValue])
         except IndexError:
             pass
         try:
-            retList["Location"] = userElements[0].getElementsByTagName("user_location")[0].childNodes[0].nodeValue
+            retList.append(["Location", userElements[0].getElementsByTagName("user_location")[0].childNodes[0].nodeValue])
         except IndexError:
             pass
         try:
-            retList["Avatar URL"] = userElements[0].getElementsByTagName("user_avatar_url")[0].childNodes[0].nodeValue
+            retList.append(["Avatar URL", userElements[0].getElementsByTagName("user_avatar_url")[0].childNodes[0].nodeValue])
         except IndexError:
             pass
         try:
-            retList["Account Type"] = userElements[0].getElementsByTagName("user_account_type")[0].childNodes[0].nodeValue
+            account_type = userElements[0].getElementsByTagName("user_account_type")[0].childNodes[0].nodeValue
+            retList.append(["Account Type", ["Normal", "Pro"][int(account_type)]])
         except IndexError:
             pass
         try:
-            retList["Default Format"] = userElements[0].getElementsByTagName("user_format_short")[0].childNodes[0].nodeValue
+            retList.append(["Default Format", userElements[0].getElementsByTagName("user_format_short")[0].childNodes[0].nodeValue])
         except IndexError:
             pass
         try:
-            retList["Default Expiration"] = userElements[0].getElementsByTagName("user_expiration")[0].childNodes[0].nodeValue
+            expire = userElements[0].getElementsByTagName("user_expiration")[0].childNodes[0].nodeValue
+            retList.append(["Default Expiration", expiration[expire]])
         except IndexError:
             pass
         try:
-            retList["Default Exposure"] = userElements[0].getElementsByTagName("user_private")[0].childNodes[0].nodeValue
+            expose = userElements[0].getElementsByTagName("user_private")[0].childNodes[0].nodeValue
+            retList.append(["Default Exposure", exposure[expose]])
         except IndexError:
             pass
 

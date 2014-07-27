@@ -338,7 +338,9 @@ class PastebinGTK(Gtk.Window):
         # Get the values as needed.
         format_ = FORMATS[format_]
         expire = EXPIRE[expire]
+        print exposure
         exposure = EXPOSURE[exposure]
+        print exposure
         
         # Close the dialog.
         new_dlg.destroy()
@@ -740,9 +742,6 @@ class PastebinGTK(Gtk.Window):
     def get_user_details(self, event):
         """Gets the user's information and settings."""
         
-        exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
-        expiration = {"N": "Never", "10M": "10 Minutes", "1H": "1 Hour", "1D": "1 Day", "1W": "1 Week", "2W": "2 Weeks", "1M": "1 Month"}
-        
         # The user must be logged in to do this.
         if not self.login:
             show_error_dialog(self, "Get User's Details", "Must be logged in to view a user's details.")
@@ -761,18 +760,8 @@ class PastebinGTK(Gtk.Window):
         # Get the user's details.
         data = self.api.getUserInfos()
         
-        # Modify any fields, as necessary.
-        data["Account Type"] = ["Normal", "Pro"][int(data["Account Type"])]
-        data["Default Expiration"] = expiration[data["Default Expiration"]]
-        data["Default Exposure"] = exposure[data["Default Exposure"]]
-        
-        # Convert dictionary to a list of lists.
-        data2 = []
-        for key, value in data.iteritems():
-            data2.append([key, value])
-        
         # Create the dialog and get the response.
-        user_dlg = UserDetailsDialog(self, "%s's User Details" % self.user_name, data2)
+        user_dlg = UserDetailsDialog(self, "%s's User Details" % self.user_name, data)
         response = user_dlg.run()
         
         # Close the dialog.
