@@ -289,36 +289,28 @@ class PastebinGTK(Gtk.Window):
             show_error_dialog(self, "Create Paste", "No text entered.")
             return
         
-        # Show the dialog.
+        # Get the name, format, expiration, and exposure for the paste.
         new_dlg = CreatePasteDialog(self)
-        
-        # Set the default values.
         new_dlg.name_ent.set_text(config["default_name"])
         new_dlg.form_com.set_active(["None", "4CS", "6502 ACME Cross Assembler", "6502 Kick Assembler", "6502 TASM/64TASS", "ABAP", "ActionScript", "ActionScript 3", "Ada", "ALGOL 68", "Apache Log", "AppleScript", "APT Sources", "ARM", "ASM (NASM)", "ASP", "Asymptote", "autoconf", "Autohotkey", "AutoIt", "Avisynth", "Awk", "BASCOM AVR", "Bash", "Basic4GL", "BibTeX", "Blitz Basic", "BNF", "BOO", "BrainFuck", "C", "C for Macs", "C Intermediate Language", "C#", "C++", "C++ (with QT extensions)", "C: Loadrunner", "CAD DCL", "CAD Lisp", "CFDG", "ChaiScript", "Clojure", "Clone C", "Clone C++", "CMake", "COBOL", "CoffeeScript", "ColdFusion", "CSS", "Cuesheet", "D", "DCL", "DCPU-16", "DCS", "Delphi", "Delphi Prism (Oxygene)", "Diff", "DIV", "DOS", "DOT", "E", "ECMAScript", "Eiffel", "Email", "EPC", "Erlang", "F#", "Falcon", "FO Language", "Formula One", "Fortran", "FreeBasic", "FreeSWITCH", "GAMBAS", "Game Maker", "GDB", "Genero", "Genie", "GetText", "Go", "Groovy", "GwBasic", "Haskell", "Haxe", "HicEst", "HQ9 Plus", "HTML", "HTML 5", "Icon", "IDL", "INI file", "Inno Script", "INTERCAL", "IO", "J", "Java", "Java 5", "JavaScript", "jQuery", "KiXtart", "Latex", "LDIF", "Liberty BASIC", "Linden Scripting", "Lisp", "LLVM", "Loco Basic", "Logtalk", "LOL Code", "Lotus Formulas", "Lotus Script", "LScript", "Lua", "M68000 Assembler", "MagikSF", "Make", "MapBasic", "MatLab", "mIRC", "MIX Assembler", "Modula 2", "Modula 3", "Motorola 68000 HiSoft Dev", "MPASM", "MXML", "MySQL", "Nagios", "newLISP", "NullSoft Installer", "Oberon 2", "Objeck Programming Langua", "Objective C", "OCalm Brief", "OCaml", "Octave", "OpenBSD PACKET FILTER", "OpenGL Shading", "Openoffice BASIC", "Oracle 11", "Oracle 8", "Oz", "ParaSail", "PARI/GP", "Pascal", "PAWN", "PCRE", "Per", "Perl", "Perl 6", "PHP", "PHP Brief", "Pic 16", "Pike", "Pixel Bender", "PL/SQL", "PostgreSQL", "POV-Ray", "Power Shell", "PowerBuilder", "ProFTPd", "Progress", "Prolog", "Properties", "ProvideX", "PureBasic", "PyCon", "Python", "Python for S60", "q/kdb+", "QBasic", "R", "Rails", "REBOL", "REG", "Rexx", "Robots", "RPM Spec", "Ruby", "Ruby Gnuplot", "SAS", "Scala", "Scheme", "Scilab", "SdlBasic", "Smalltalk", "Smarty", "SPARK", "SPARQL", "SQL", "StoneScript", "SystemVerilog", "T-SQL", "TCL", "Tera Term", "thinBasic", "TypoScript", "Unicon", "UnrealScript", "UPC", "Urbi", "Vala", "VB.NET", "Vedit", "VeriLog", "VHDL", "VIM", "Visual Pro Log", "VisualBasic", "VisualFoxPro", "WhiteSpace", "WHOIS", "Winbatch", "XBasic", "XML", "Xorg Config", "XPP", "YAML", "Z80 Assembler", "ZXBasic"].index(config["default_format"]))
         new_dlg.expi_com.set_active(["Never", "10 Minutes", "1 Hour", "1 Day", "1 Week", "2 Weeks", "1 Month"].index(config["default_expiration"]))
         new_dlg.expo_com.set_active(["Public", "Unlisted", "Private"].index(config["default_exposure"]))
-        
         response = new_dlg.run()
-        
-        # Get the fields.
         name = new_dlg.name_ent.get_text()
         format_ = new_dlg.form_com.get_active_text()
         expire = new_dlg.expi_com.get_active_text()
         exposure = new_dlg.expo_com.get_active_text()
+        new_dlg.destroy()
         
         # Get the values as needed.
         format_ = FORMATS[format_]
         expire = EXPIRE[expire]
         exposure = EXPOSURE[exposure]
         
-        # Close the dialog.
-        new_dlg.destroy()
-        
         # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
             
             try:
-                
                 # Send the paste.
                 url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
                 
@@ -346,7 +338,6 @@ class PastebinGTK(Gtk.Window):
                     show_alert_dialog(self, "Create Paste", "Paste triggered automatic spam detection filter. Verify that you are not a bot by filling out the captcha at the following URL:\n\n%s" % url)
             
             except urllib2.URLError:
-                
                 # Show an error if the paste could not be sent. This will occur if the user isn't connected to the internet.
                 show_error_dialog(self, "Create Paste", "Paste could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
     
@@ -357,16 +348,12 @@ class PastebinGTK(Gtk.Window):
         # If the key hasn't been specified, prompt the user.
         if not key:
         
-            # Show the dialog.
+            # Get the key.
             get_dlg = GetPasteDialog(self)
             response = get_dlg.run()
-            
-            # Get the key and parse it, if necessary.
             key = get_dlg.key_ent.get_text()
             if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
                 key = key.rsplit("/", 1)[-1]
-            
-            # Close the dialog.
             get_dlg.destroy()
         
             # If the user did not click OK, don't continue.
@@ -386,7 +373,6 @@ class PastebinGTK(Gtk.Window):
             show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste key was specifed.")
             
         else:
-            
             # Delete the current text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
@@ -424,18 +410,15 @@ class PastebinGTK(Gtk.Window):
             return
         
         try:
-            
             # Get the list of the user's pastes.
             pastes = self.api.listUserPastes()
         
         except PastebinNoPastesException:
-            
             # If there are no pastes, tell the user.
             show_alert_dialog(self, "Delete Paste", "The currently logged in user has no pastes.")
             return
         
         except urllib2.URLError:
-            
             show_error_dialog(self, "List User's Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
@@ -449,22 +432,14 @@ class PastebinGTK(Gtk.Window):
             new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
             data.append(new)
         
-        # Show the dialog.
+        # Get the paste to delete.
         del_dlg = DeletePasteDialog(self, data)
         response = del_dlg.run()
-        
-        # Get the selected item.
         model, treeiter = del_dlg.treeview.get_selection().get_selected()
-        
-        # Close the dialog.
         del_dlg.destroy()
         
-        # If the user did not press OK, don't continue.
-        if response != Gtk.ResponseType.OK:
-            return
-        
-        # If nothing was selected, don't continue.
-        if treeiter == None:
+        # If the user did not press OK or nothing was selected, don't continue.
+        if response != Gtk.ResponseType.OK or treeiter == None:
             return
         
         # Get the name and key.
@@ -472,22 +447,18 @@ class PastebinGTK(Gtk.Window):
         key = model[treeiter][1]
         
         try:
-            
             # Get the paste.
             paste = self.api.deletePaste(api_paste_key = key)
         
         except urllib2.URLError:
-            
             # Show an error if the paste could not be deleted. This will occur if the user isn't connected to the internet.
             show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
         
         except PastebinHTTPErrorException:
-            
             # Show an error if the paste could not be deleted. This will occur if the key is invalid.
             show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that an invalid paste key was specifed.")
             
         else:
-            
             if paste == True:
                 show_alert_dialog(self, "Delete Paste", "%s was successfully deleted." % ("Paste \"%s\"" % paste_name if paste_name != "" else "Untitled paste"))
             else:
@@ -497,16 +468,16 @@ class PastebinGTK(Gtk.Window):
     def pastebin_login(self, event):
         """Logs the user in."""
         
-        # Show the dialog.
+        # Get the username and password.
         login_dlg = LoginDialog(self)
         if config["remember_username"]:
             login_dlg.name_ent.set_text(self.user_name)
         response = login_dlg.run()
+        user_name = login_dlg.name_ent.get_text()
+        password = login_dlg.pass_ent.get_text()
         
         # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
-            user_name = login_dlg.name_ent.get_text()
-            password = login_dlg.pass_ent.get_text()
             
             # If the username and password are valid, get the user key
             if user_name != "" and password != "":
@@ -527,12 +498,10 @@ class PastebinGTK(Gtk.Window):
                     self.login = False
             
             else:
-                
                 show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % "username" if user_name == "" else "password")
                 self.login = False
         
         else:
-            
             show_alert_dialog(self, "Login", "No username or password specified.\n\nNot logged in.")
             self.login = False
             
@@ -596,14 +565,10 @@ class PastebinGTK(Gtk.Window):
             
             data.append(new)
         
-        # Create the dialog and get the response.
+        # Show the user's pastes.
         list_dlg = ListPastesDialog(self, "%s's Pastes" % self.user_name, data)
         response = list_dlg.run()
-        
-        # Get the selected item.
         model, treeiter = list_dlg.treeview.get_selection().get_selected()
-        
-        # Close the dialog.
         list_dlg.destroy()
         
         # If the user clicked "Get Paste", load the selected paste.
@@ -662,14 +627,10 @@ class PastebinGTK(Gtk.Window):
             
             data.append(new)
         
-        # Create the dialog and get the response.
+        # Show the trending pastes.
         list_dlg = ListPastesDialog(self, "Currently Trending Pastes", data)
         response = list_dlg.run()
-        
-        # Get the selected item.
         model, treeiter = list_dlg.treeview.get_selection().get_selected()
-        
-        # Close the dialog.
         list_dlg.destroy()
         
         # If the user clicked "Get Paste", load the selected paste.
@@ -703,11 +664,9 @@ class PastebinGTK(Gtk.Window):
         # Get the user's details.
         data = self.api.getUserInfos()
         
-        # Create the dialog and get the response.
+        # Show the user's details.
         user_dlg = UserDetailsDialog(self, "%s's User Details" % self.user_name, data)
         response = user_dlg.run()
-        
-        # Close the dialog.
         user_dlg.destroy()
         
         # If the user pressed "View Profile", open the profile in a web browser.
@@ -718,16 +677,15 @@ class PastebinGTK(Gtk.Window):
     def save_file(self, event):
         """Saves the text to a file."""
         
-        # Create the dialog.
+        # Get the filename.
         save_dlg = Gtk.FileChooserDialog("Save to File", self, Gtk.FileChooserAction.SAVE, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         save_dlg.set_do_overwrite_confirmation(True)
-        
-        # Get the response.
         response = save_dlg.run()
+        filename = save_dlg.get_filename()
+        save_dlg.destroy()
+        
+        # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
-            
-            # Get the filename.
-            filename = save_dlg.get_filename()
             
             # Save the data.
             try:
@@ -739,24 +697,20 @@ class PastebinGTK(Gtk.Window):
                 # Show the error message.
                 # This only shows if the error occurred when writing to the file.
                 print("Error writing to file (IOError).")
-            
-        # Close the dialog.
-        save_dlg.destroy()
     
     
     def open_file(self, event):
         """Opens the text from a file."""
         
-        # Create the dialog.
+        # Get the filename.
         open_dlg = Gtk.FileChooserDialog("Open from File", self, Gtk.FileChooserAction.OPEN, (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
         open_dlg.set_do_overwrite_confirmation(True)
-        
-        # Get the response.
         response = open_dlg.run()
+        filename = open_dlg.get_filename()
+        open_dlg.destroy()
+        
+        # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
-            
-            # Get the filename.
-            filename = open_dlg.get_filename()
             
             # Read the data.
             try:
@@ -773,17 +727,14 @@ class PastebinGTK(Gtk.Window):
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert_at_cursor(data)
             self.text_buffer.place_cursor(self.text_buffer.get_start_iter())
-            
-        # Close the dialog.
-        open_dlg.destroy()
-    
+        
     
     def options(self, event):
         """Shows the Options dialog."""
         
         global config
         
-        # Create the dialog and get the response.
+        # Get the new options.
         opt_dlg = OptionsDialog(self, config)
         response = opt_dlg.run()
         
