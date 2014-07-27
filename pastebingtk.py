@@ -338,9 +338,7 @@ class PastebinGTK(Gtk.Window):
         # Get the values as needed.
         format_ = FORMATS[format_]
         expire = EXPIRE[expire]
-        print exposure
         exposure = EXPOSURE[exposure]
-        print exposure
         
         # Close the dialog.
         new_dlg.destroy()
@@ -770,7 +768,7 @@ class PastebinGTK(Gtk.Window):
         # If the user pressed "View Profile", open the profile in a web browser.
         if response == 9:
             
-            webbrowser.open(data["User URL"])
+            webbrowser.open(data[1][1])
     
     
     def save_file(self, event):
@@ -1001,7 +999,7 @@ elif __name__ == "__main__" and len(sys.argv) > 1:
     
     # Make sure the usage is correct.
     if len(sys.argv) < 3:
-        print("Usage: pastebincl [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
+        print("Usage: python pastebingtk.py [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
         sys.exit()
     
     # Uploading text:
@@ -1019,4 +1017,4 @@ elif __name__ == "__main__" and len(sys.argv) > 1:
     
     # Other command:
     else:
-        print("Usage: pastebincl [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
+        print("Usage: python pastebingtk.py [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
