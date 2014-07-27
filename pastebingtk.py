@@ -370,6 +370,10 @@ class PastebinGTK(Gtk.Window):
             # Get the key.
             key = get_dlg.key_ent.get_text()
             
+            # Parse the key, if necessary.
+            if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
+                key = key.rsplit("/", 1)[-1]
+            
             # Close the dialog.
             get_dlg.destroy()
         
