@@ -141,25 +141,21 @@ if not "check_spam" in config:
 if config["remember_username"]:
     
     try:
-        # Load the username.
         user_file = open("%s/username" % main_dir, "r")
         username = user_file.read()
         user_file.close()
     
     except IOError:
-        # Continue.
         username = ""
 
 # Get the previous window size.
 try:
-    # Load the window size file.
     wins_file = open("%s/window_size" % main_dir, "r")
     last_width = int(wins_file.readline())
     last_height = int(wins_file.readline())
     wins_file.close()
 
 except IOError:
-    # Continue.
     last_width = 700
     last_height = 500
 
@@ -183,39 +179,30 @@ class PastebinGTK(Gtk.Window):
         self.dev_key = config["dev_key"]
         self.login = False
         
-        # Initalize the PastebinPython object.
+        # Initalize the PastebinPython API object. This is what is used to
+        # make the API requests to Pastebin.
         self.api = PastebinPython(api_dev_key = self.dev_key)
         
         # Create the window.
         Gtk.Window.__init__(self, title = TITLE)
-        # Set the size.
         self.set_default_size(last_width, last_height)
-        # Set the icon.
         self.set_icon_from_file("resources/images/icon.png")
         
-        # Create the scrolled window for the text box.
+        # Build the UI.
         scrolled_window = Gtk.ScrolledWindow()
-        
-        # It should expand both horizontally and vertically.
         scrolled_window.set_hexpand(True)
         scrolled_window.set_vexpand(True)
-        
-        # Create the sourceview.
         self.text_view = GtkSource.View.new()
         self.language_manager = GtkSource.LanguageManager.new()
         self.text_buffer = self.text_view.get_buffer()
+        scrolled_window.add(self.text_view)
         
         # Show line numbers, if the user wants that.
         if config["line_numbers"]:
             self.text_view.set_show_line_numbers(True)
         
-        # Add the text box to the scrolled window.
-        scrolled_window.add(self.text_view)
-        
-        # Create the action group for the menus.
+        # Create the menus.
         action_group = Gtk.ActionGroup("actions")
-        
-        # Create the Pastebin menu.
         action_group.add_actions([
             ("pastebin_menu", None, "_Pastebin"),
             ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
@@ -228,51 +215,35 @@ class PastebinGTK(Gtk.Window):
             ("user_details", None, "G_et User's Details...", None, None, self.get_user_details),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
         ])
-        
-        # Create the Text menu.
         action_group.add_actions([
             ("text_menu", None, "_Text"),
             ("save", Gtk.STOCK_SAVE, "_Save to File...", "<Control>s", "Save to file", self.save_file),
             ("open", Gtk.STOCK_OPEN, "_Open from File...", "<Control>o", "Open from file", self.open_file)
         ])
-        
-        # Create the Options menu.
         action_group.add_actions([
             ("options_menu", None, "_Options"),
             ("options", None, "_Options...", "F2", None, self.options)
         ])
-        
-        # Create the Help menu.
         action_group.add_actions([
             ("help_menu", None, "_Help"),
             ("help", None, "_Help...", "F1", None, self.show_help),
             ("about", None, "_About...", "<Shift>F1", None, self.show_about),
         ])
         
-        # Create the UI manager.
+        # Set up the menus.
         ui_manager = Gtk.UIManager()
         ui_manager.add_ui_from_string(MENU_DATA)
-        
-        # Add the accelerator group to the toplevel window
         accel_group = ui_manager.get_accel_group()
         self.add_accel_group(accel_group)
         ui_manager.insert_action_group(action_group)
         
-        # Create the grid for the UI.
+        # Create the grid for the UI and add the UI items.
         grid = Gtk.Grid()
-        
-        # Add the menubar to the window.
         menubar = ui_manager.get_widget("/menubar")
         grid.add(menubar)
-        
-        # Add the toolbar.
         toolbar = ui_manager.get_widget("/toolbar")
         grid.attach_next_to(toolbar, menubar, Gtk.PositionType.BOTTOM, 1, 1)
-
-        # Add the scrolled window to the window.
         grid.attach_next_to(scrolled_window, toolbar, Gtk.PositionType.BOTTOM, 1, 1)
-        
-        # Add the status bar.
         self.status_lbl = Gtk.Label("Not logged in")
         self.status_lbl.set_alignment(0, 0.5)
         grid.attach_next_to(self.status_lbl, scrolled_window, Gtk.PositionType.BOTTOM, 1, 1)
@@ -356,7 +327,6 @@ class PastebinGTK(Gtk.Window):
                 if config["check_spam"]:
                     
                     try:
-                        # Get the paste.
                         paste = self.api.getPasteRawOutput(api_paste_key = url.rsplit("/", 1)[-1])
                 
                     except urllib2.URLError:
@@ -391,10 +361,8 @@ class PastebinGTK(Gtk.Window):
             get_dlg = GetPasteDialog(self)
             response = get_dlg.run()
             
-            # Get the key.
+            # Get the key and parse it, if necessary.
             key = get_dlg.key_ent.get_text()
-            
-            # Parse the key, if necessary.
             if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
                 key = key.rsplit("/", 1)[-1]
             
@@ -422,8 +390,6 @@ class PastebinGTK(Gtk.Window):
             # Delete the current text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
-            
-            # Set the cursor to the beginning of the sourceview.
             self.text_buffer.place_cursor(self.text_buffer.get_start_iter())
             
             # Guess the language, if the user wants that.
@@ -475,10 +441,7 @@ class PastebinGTK(Gtk.Window):
         
         # Create the list of data.
         data = []
-        
-        # Loop through the pastes and add the data.
         for i in pastes:
-            
             new = []
             new.append(i["paste_title"])
             new.append(i["paste_key"])
@@ -527,7 +490,6 @@ class PastebinGTK(Gtk.Window):
             
             if paste == True:
                 show_alert_dialog(self, "Delete Paste", "%s was successfully deleted." % ("Paste \"%s\"" % paste_name if paste_name != "" else "Untitled paste"))
-            
             else:
                 show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
     
@@ -597,27 +559,21 @@ class PastebinGTK(Gtk.Window):
             return
         
         try:
-            
-            # Run the function to get the list of pastes.
+            # Get the list of the user's pastes.
             pastes = self.api.listUserPastes()
         
         except PastebinNoPastesException:
-            
             # If there are no pastes, tell the user.
             show_alert_dialog(self, "List User's Pastes", "The currently logged in user has no pastes.")
             return
         
         except urllib2.URLError:
-            
             show_error_dialog(self, "List User's Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
         # Create the list of data.
         data = []
-        
-        # Loop through the pastes and add the data.
         for i in pastes:
-            
             new = []
             new.append(i["paste_title"])
             new.append(i["paste_key"])
@@ -657,10 +613,8 @@ class PastebinGTK(Gtk.Window):
             if treeiter == None:
                 return
             
-            # Get the key.
+            # Get the key and load the paste.
             key = model[treeiter][1]
-            
-            # Load the paste.
             self.get_paste(event = None, key = key)
     
     
@@ -670,25 +624,20 @@ class PastebinGTK(Gtk.Window):
         exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
         
         try:
-            
             # Run the function to get the list of pastes.
             pastes = self.api.listTrendingPastes()
         
         except PastebinNoPastesException:
-            
             # If there are no pastes, tell the user.
             show_alert_dialog(self, "List Trending Pastes", "There are no trending pastes.")
             return
         
         except urllib2.URLError:
-            
             show_error_dialog(self, "List Trending Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
         # Create the list of data.
         data = []
-        
-        # Loop through the pastes and add the data.
         for i in pastes:
             
             new = []
@@ -730,10 +679,8 @@ class PastebinGTK(Gtk.Window):
             if treeiter == None:
                 return
             
-            # Get the key.
+            # Get the key and load the paste.
             key = model[treeiter][1]
-            
-            # Load the paste.
             self.get_paste(event = None, key = key)
     
     
@@ -746,12 +693,10 @@ class PastebinGTK(Gtk.Window):
             return
         
         try:
-            
             # Run the function to get the user's details
             info = self.api.getUserInfos()
         
         except urllib2.URLError:
-            
             show_error_dialog(self, "Get User's Details", "Details could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
@@ -767,7 +712,6 @@ class PastebinGTK(Gtk.Window):
         
         # If the user pressed "View Profile", open the profile in a web browser.
         if response == 9:
-            
             webbrowser.open(data[1][1])
     
     
@@ -787,13 +731,11 @@ class PastebinGTK(Gtk.Window):
             
             # Save the data.
             try:
-                # Write to the specified file.
                 data_file = open(filename, "w")
                 data_file.write(self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False))
                 data_file.close()
                 
             except IOError:
-                
                 # Show the error message.
                 # This only shows if the error occurred when writing to the file.
                 print("Error writing to file (IOError).")
@@ -818,14 +760,11 @@ class PastebinGTK(Gtk.Window):
             
             # Read the data.
             try:
-                
-                # Read from the specified file.
                 data_file = open(filename, "r")
                 data = data_file.read()
                 data_file.close()
                 
             except IOError:
-                
                 # Show the error message.
                 # This only shows if the error occurred when reading from the file.
                 print("Error reading from file (IOError).")
@@ -833,6 +772,7 @@ class PastebinGTK(Gtk.Window):
             # Delete the old text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert_at_cursor(data)
+            self.text_buffer.place_cursor(self.text_buffer.get_start_iter())
             
         # Close the dialog.
         open_dlg.destroy()
@@ -843,10 +783,8 @@ class PastebinGTK(Gtk.Window):
         
         global config
         
-        # Create the dialog.
+        # Create the dialog and get the response.
         opt_dlg = OptionsDialog(self, config)
-        
-        # Get the response.
         response = opt_dlg.run()
         
         # If the user pressed OK:
@@ -905,8 +843,6 @@ class PastebinGTK(Gtk.Window):
         img_file = open("resources/images/icon.png", "rb")
         img_bin = img_file.read()
         img_file.close()
-        
-        # Get the PixBuf.
         loader = GdkPixbuf.PixbufLoader.new_with_type("png")
         loader.write(img_bin)
         loader.close()
@@ -915,23 +851,15 @@ class PastebinGTK(Gtk.Window):
         # Create the dialog.
         about_dlg = Gtk.AboutDialog()
         
-        # Set the title.
+        # Set the details.
         about_dlg.set_title("About " + TITLE)
-        # Set the program name.
         about_dlg.set_program_name(TITLE)
-        # Set the program icon.
         about_dlg.set_logo(pixbuf)
-        # Set the program version.
         about_dlg.set_version(VERSION)
-        # Set the comments.
         about_dlg.set_comments("PastebinGTK is a desktop client for pastebin.com.")
-        # Set the copyright notice.
-        about_dlg.set_copyright("Copyright (c) 2013 Adam Chesak")
-        # Set the authors.
+        about_dlg.set_copyright("Copyright (c) 2013-2014 Adam Chesak")
         about_dlg.set_authors(["Adam Chesak <achesak@yahoo.com>"])
-        # Set the license.
         about_dlg.set_license(license_text)
-        # Set the website.
         about_dlg.set_website("http://poultryandprogramming.wordpress.com/")
         about_dlg.set_website_label("http://poultryandprogramming.wordpress.com/")
         
@@ -944,15 +872,12 @@ class PastebinGTK(Gtk.Window):
         
         # Confirm that the user wants to quit, if they want that.
         if config["confirm_exit"]:
-            
             conf_exit = show_question_dialog(self, "Exit", "Are you sure you want to exit?")
-            
             if conf_exit != Gtk.ResponseType.OK:
                 return True
         
         # Save the configuration.
         try:
-            # Save the configuration file.
             config_file = open("%s/config" % main_dir, "w")
             json.dump(config, config_file)
             config_file.close()
@@ -971,7 +896,6 @@ class PastebinGTK(Gtk.Window):
         if config["remember_username"]:
             
             try:
-                # Save the username.
                 user_file = open("%s/username" % main_dir, "w")
                 user_file.write(self.user_name)
                 user_file.close()
