@@ -332,7 +332,7 @@ class PastebinGTK(Gtk.Window):
                 
                 
                 # Show the url.
-                if not caught_spam:
+                if not caught_spam or exposure == 2:
                     show_alert_dialog(self, "Create Paste", "Paste has been successfully created, and can be found at the following URL:\n\n%s" % url)
                 else:
                     show_alert_dialog(self, "Create Paste", "Paste triggered automatic spam detection filter. Verify that you are not a bot by filling out the captcha at the following URL:\n\n%s" % url)
