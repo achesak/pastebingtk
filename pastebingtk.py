@@ -36,7 +36,7 @@ THE SOFTWARE.
 
 # Import any needed modules.
 # Import Gtk and Gdk for the interface.
-from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import Gtk, Gdk, GdkPixbuf, Pango
 # Import GtkSource for the sourceview widget.
 from gi.repository import GtkSource
 # Import sys for closing the application and getting command line arguments.
@@ -196,6 +196,10 @@ class PastebinGTK(Gtk.Window):
         self.language_manager = GtkSource.LanguageManager.new()
         self.text_buffer = self.text_view.get_buffer()
         scrolled_window.add(self.text_view)
+        
+        # Set the font to the system default monospaced.
+        self.font = Pango.FontDescription("Courier New")
+        self.text_view.modify_font(self.font)
         
         # Show line numbers, if the user wants that.
         if config["line_numbers"]:
