@@ -446,6 +446,11 @@ class PastebinGTK(Gtk.Window):
         paste_name = model[treeiter][0]
         key = model[treeiter][1]
         
+        # Ask the user for confirmation.
+        del_conf = show_question_dialog(self, "Delete Paste", "Are you sure you want to delete the selected paste?")
+        if del_conf != Gtk.ResponseType.OK:
+            return
+        
         try:
             # Get the paste.
             paste = self.api.deletePaste(api_paste_key = key)
