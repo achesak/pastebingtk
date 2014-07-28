@@ -208,8 +208,8 @@ class PastebinGTK(Gtk.Window):
             ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
             ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", self.get_paste),
             ("delete_paste", Gtk.STOCK_DELETE, "_Delete Paste...", "<Control>d", "Delete a paste", self.delete_paste),
-            ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, self.list_trending_pastes),
-            ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, self.list_users_pastes),
+            ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, lambda x: self.list_pastes(source = "trending")),
+            ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, lambda x: self.list_pastes(source = "user")),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut...", "<Shift><Control>l", None, self.pastebin_logout),
             ("user_details", None, "G_et User's Details...", None, None, self.get_user_details),
@@ -522,27 +522,32 @@ class PastebinGTK(Gtk.Window):
         show_alert_dialog(self, "Logout", "You are now logged out.")
     
     
-    def list_users_pastes(self, event):
-        """Gets the user's pastes"""
+    def list_pastes(self, source):
+        """Get's the user's pastes or the currently trending pastes."""
         
         exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
+        title1 = "List User's Pastes" if source == "user" else "List Trending Pastes"
+        title2 = "%s's Pastes" % self.user_name if source == "user" else "Trending Pastes"
         
-        # The user must be logged in to do this.
-        if not self.login:
-            show_error_dialog(self, "List User's Pastes", "Must be logged in to view a user's pastes.")
+        # If getting the user's pastes, the user must be logged in.
+        if source == "user" and not self.login:
+            show_error_dialog(self, title1, "Must be logged in to view a user's pastes.")
             return
         
         try:
-            # Get the list of the user's pastes.
-            pastes = self.api.listUserPastes()
+            # Get the list of pastes.
+            if source == "user":
+                pastes = self.api.listUserPastes()
+            else:
+                pastes = self.api.listTrendingPastes()
         
         except PastebinNoPastesException:
             # If there are no pastes, tell the user.
-            show_alert_dialog(self, "List User's Pastes", "The currently logged in user has no pastes.")
+            show_alert_dialog(self, title1, "The currently logged in user has no pastes.")
             return
         
         except urllib2.URLError:
-            show_error_dialog(self, "List User's Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            show_error_dialog(self, title1, "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
         # Create the list of data.
@@ -570,8 +575,8 @@ class PastebinGTK(Gtk.Window):
             
             data.append(new)
         
-        # Show the user's pastes.
-        list_dlg = ListPastesDialog(self, "%s's Pastes" % self.user_name, data)
+        # Show the list of pastes.
+        list_dlg = ListPastesDialog(self, title2, data)
         response = list_dlg.run()
         model, treeiter = list_dlg.treeview.get_selection().get_selected()
         list_dlg.destroy()
@@ -586,70 +591,8 @@ class PastebinGTK(Gtk.Window):
             # Get the key and load the paste.
             key = model[treeiter][1]
             self.get_paste(event = None, key = key)
-    
-    
-    def list_trending_pastes(self, event):
-        """Gets the trending pastes."""
         
-        exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
         
-        try:
-            # Run the function to get the list of pastes.
-            pastes = self.api.listTrendingPastes()
-        
-        except PastebinNoPastesException:
-            # If there are no pastes, tell the user.
-            show_alert_dialog(self, "List Trending Pastes", "There are no trending pastes.")
-            return
-        
-        except urllib2.URLError:
-            show_error_dialog(self, "List Trending Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
-            return
-        
-        # Create the list of data.
-        data = []
-        for i in pastes:
-            
-            new = []
-            new.append(i["paste_title"])
-            new.append(i["paste_key"])
-            new.append(i["paste_format_long"])
-            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
-            if i["paste_expire_date"] == "0":
-                new.append("Never")
-            else:
-                new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_expire_date"]))))
-            new.append(exposure[i["paste_private"]])
-            size = int(i["paste_size"])
-            if size < 1000:
-                new.append("%d bytes" % size)
-            elif size < 1000 * 1000:
-                new.append("%d kB" % (size / 1000))
-            else:
-                new.append("%d MB" % (size / (1000 * 1000)))
-            new.append(i["paste_hits"])
-            new.append(i["paste_url"])
-            
-            data.append(new)
-        
-        # Show the trending pastes.
-        list_dlg = ListPastesDialog(self, "Currently Trending Pastes", data)
-        response = list_dlg.run()
-        model, treeiter = list_dlg.treeview.get_selection().get_selected()
-        list_dlg.destroy()
-        
-        # If the user clicked "Get Paste", load the selected paste.
-        if response == 9:
-            
-            # If nothing was selected, don't continue.
-            if treeiter == None:
-                return
-            
-            # Get the key and load the paste.
-            key = model[treeiter][1]
-            self.get_paste(event = None, key = key)
-    
-    
     def get_user_details(self, event):
         """Gets the user's information and settings."""
         
