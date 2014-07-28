@@ -49,18 +49,12 @@ def upload(args, dev_key):
     url = api.createPaste(api_paste_code = text, api_paste_name = title, api_paste_format = format_, api_paste_private = exposure,
                                api_paste_expire_date = expiration)
     
-    # Return the paste URL.
     return url
 
 
 def download(args, dev_key):
     """Downloads text from pastebin.com."""
     
-    # Initalize the PastebinPython object.
     api = PastebinPython(api_dev_key = dev_key)
-    
-    # Get the paste.
     paste = api.getPasteRawOutput(api_paste_key = args[2])
-    
-    # Return the paste text.
     return paste
