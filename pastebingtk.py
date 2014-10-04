@@ -477,6 +477,11 @@ class PastebinGTK(Gtk.Window):
     def pastebin_login(self, event):
         """Logs the user in."""
         
+        # If the user is alread logged in, don't continue.
+        if self.login:
+            show_alert_dialog(self, "Login", "Already logged in as %s." % self.user_name)
+            return
+        
         # Get the username and password.
         login_dlg = LoginDialog(self)
         if config["remember_username"]:
@@ -495,7 +500,7 @@ class PastebinGTK(Gtk.Window):
                     self.user_key = self.api.createAPIUserKey(user_name, password)
                     self.user_name = user_name
                     self.login = True
-                    self.status_lbl.set_text("Logged in as %s" % user_name)
+                    self.status_lbl.set_text("Logged in as %s." % user_name)
                     show_alert_dialog(self, "Login", "Successfully logged in as %s." % user_name)
                 
                 except PastebinBadRequestException:
