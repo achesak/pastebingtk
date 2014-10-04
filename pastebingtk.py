@@ -592,6 +592,11 @@ class PastebinGTK(Gtk.Window):
             if treeiter == None:
                 return
             
+            # Can't load private pastes due to API restrictions.
+            if model[treeiter][5] == "Private":
+                show_alert_dialog(self, title2, "Due to API restictions PastebinGTK is unable to load private pastes.")
+                return
+            
             # Get the key and load the paste.
             key = model[treeiter][1]
             self.get_paste(event = None, key = key)
