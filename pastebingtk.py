@@ -55,6 +55,19 @@ import time
 import json
 # Import webbrowser for opening websites in the user's browser.
 import webbrowser
+# Import HTMLParser for parsing html files.
+try:
+    from HTMLParser import HTMLParser
+except ImportError:
+    from html.parser import HTMLParser
+# Try to import BeautifulSoup. This is needed for getting the list
+# of most recently created pastes. If the user doesn't have it installed,
+# fail as gracefully as possible.
+try:
+    from bs4 import BeautifulSoup
+    bs4_installed = True
+except ImportError:
+    bs4_installed = False
 
 # Tell Python not to create bytecode files, as they mess with the git repo.
 # This line can be removed be the user, if desired.
@@ -210,10 +223,11 @@ class PastebinGTK(Gtk.Window):
         action_group.add_actions([
             ("pastebin_menu", None, "_Pastebin"),
             ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
-            ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>r", "Get a paste", self.get_paste),
+            ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>g", "Get a paste", self.get_paste),
             ("delete_paste", Gtk.STOCK_DELETE, "_Delete Paste...", "<Control>d", "Delete a paste", self.delete_paste),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, lambda x: self.list_pastes(source = "trending")),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, lambda x: self.list_pastes(source = "user")),
+            ("list_recent_pastes", None, "List _Recent Pastes...", "<Control>r", None, self.list_recent),
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Logo_ut...", "<Shift><Control>l", None, self.pastebin_logout),
             ("user_details", None, "G_et User's Details...", None, None, self.get_user_details),
@@ -605,7 +619,50 @@ class PastebinGTK(Gtk.Window):
             # Get the key and load the paste.
             key = model[treeiter][1]
             self.get_paste(event = None, key = key)
+    
+    
+    def list_recent(self, event):
+        """Lists recently created pastes."""
         
+        # Get the list of most recently created pastes.
+        try:
+            response = urllib2.urlopen("http://pastebin.com/archive")
+            html = response.read()
+        
+        except urllib2.URLError:
+            show_error_dialog(self, "List Recent Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
+        # Parse the relevant data.
+        parser = BeautifulSoup(html)
+        data = []
+        
+        # Structure: Body > Table > TR > data stored in TD
+        rows = parser.find("body").find("table", {"class": "maintable"}).find_all("tr")
+        for i in rows:
+            if len(i.find_all("th")) > 0:
+                continue
+            td = i.find_all("td")
+            link = td[0].a
+            row = [
+                link.string,                            # Name
+                link["href"][1:],                       # Key
+                td[2].a.string,                         # Format
+                td[1].string,                           # Time created
+                "http://pastebin.com" + link["href"]    # Link
+            ]
+            print(row[0])
+            rows.append(i)
+        
+        ## END OF WHAT'S DONE:
+        ## DEBUGGING OUTPUT:
+        
+        #for i in rows:
+        #    print(i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4])
+            
+        
+        
+    
         
     def get_user_details(self, event):
         """Gets the user's information and settings."""
