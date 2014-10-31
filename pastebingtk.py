@@ -85,8 +85,9 @@ from resources.dialogs.create_dialog import CreatePasteDialog
 from resources.dialogs.get_dialog import GetPasteDialog
 # Import the delete paste dialog.
 from resources.dialogs.delete_dialog import DeletePasteDialog
-# Import the paste list dialog.
+# Import the paste list dialogs.
 from resources.dialogs.list_user_dialog import ListPastesDialog
+from resources.dialogs.list_recent_dialog import ListRecentDialog
 # Import the user details dialog.
 from resources.dialogs.user_details_dialog import UserDetailsDialog
 # Import the options dialog.
@@ -624,6 +625,11 @@ class PastebinGTK(Gtk.Window):
     def list_recent(self, event):
         """Lists recently created pastes."""
         
+        # If BeautifulSoup is not installed, this feature won't work.
+        if not bs4_installed:
+            show_alert_dialog(self, "List Recent Pastes", "This feature requires the BeautifulSoup 4 HTML parsing library to be installed.")
+            return
+        
         # Get the list of most recently created pastes.
         try:
             response = urllib2.urlopen("http://pastebin.com/archive")
@@ -651,19 +657,26 @@ class PastebinGTK(Gtk.Window):
                 td[1].string,                           # Time created
                 "http://pastebin.com" + link["href"]    # Link
             ]
-            print(row[0])
-            rows.append(i)
+            data.append(row)
         
-        ## END OF WHAT'S DONE:
-        ## DEBUGGING OUTPUT:
+        # Show the list of pastes.
+        list_dlg = ListRecentDialog(self, "List Recent Pastes", data)
+        response = list_dlg.run()
+        model, treeiter = list_dlg.treeview.get_selection().get_selected()
+        list_dlg.destroy()
         
-        #for i in rows:
-        #    print(i[0] + " " + i[1] + " " + i[2] + " " + i[3] + " " + i[4])
+        # If the user clicked "Get Paste", load the selected paste.
+        if response == 9:
             
-        
-        
+            # If nothing was selected, don't continue.
+            if treeiter == None:
+                return
+            
+            # Get the key and load the paste.
+            key = model[treeiter][1]
+            self.get_paste(event = None, key = key)
     
-        
+    
     def get_user_details(self, event):
         """Gets the user's information and settings."""
         
