@@ -1,0 +1,11 @@
+python-pastebin is a complete wrapper of the pastebin.com API for the Python language. It is able to create, delete, list, and get pastes. In addition, it also contains other features that do not imvolve the API, such as the ability to list recently created pastes.
+
+python-pastebin consists of two files: pastebin_api.py and pastebin_extras.py. Any feature of pastebin.com that can be used through the API is available in the pastebin_api.py file. Other features are contained in pastebin_extras.py
+
+---
+
+The main API wrapper has dependencies outside of the Python standard library. pastebin_extras.py, however, also requires the Beautiful Soup 4 HTML parser.
+
+----
+
+python-pastebin is released under the MIT open source license.
