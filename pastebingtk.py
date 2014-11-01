@@ -374,13 +374,19 @@ class PastebinGTK(Gtk.Window):
         
         try:
             # Get the paste.
-            paste = self.api.getPasteRawOutput(api_paste_key = key)
+            paste = pastebin_api.get_paste(pastekey = key)
         
         except urllib2.URLError:
             # Show an error if the paste could not be retrieved. This will occur if the user isn't connected to the internet.
-            show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste was specified, you are not connected to the internet, or the pastebin.com website is down.")
         
         else:
+            
+            # Did we try to load a private paste?
+            if paste == "Error, this is a private paste. If this is your private paste, please login to Pastebin first.":
+                show_alert_dialog(self, "Get Paste", "Due to API restrictions PastebinGTK is unable to load private pastes.")
+                return
+            
             # Delete the current text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
@@ -603,7 +609,7 @@ class PastebinGTK(Gtk.Window):
             
             # Can't load private pastes due to API restrictions.
             if model[treeiter][5] == "Private":
-                show_alert_dialog(self, title2, "Due to API restictions PastebinGTK is unable to load private pastes.")
+                show_alert_dialog(self, title2, "Due to API restrictions PastebinGTK is unable to load private pastes.")
                 return
             
             # Get the key and load the paste.
