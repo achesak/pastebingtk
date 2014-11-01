@@ -627,30 +627,17 @@ class PastebinGTK(Gtk.Window):
         
         # Get the list of most recently created pastes.
         try:
-            response = urllib2.urlopen("http://pastebin.com/archive")
-            html = response.read()
+            pastes = pastebin_extras.list_recent_pastes()
         
         except urllib2.URLError:
             show_error_dialog(self, "List Recent Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
-        # Parse the relevant data.
-        parser = BeautifulSoup(html)
+        # Reformat the data into something the dialog can use.
         data = []
-        
-        # Structure: Body > Table > TR > data stored in TD
-        rows = parser.find("body").find("table", {"class": "maintable"}).find_all("tr")
-        for i in rows:
-            if len(i.find_all("th")) > 0:
-                continue
-            td = i.find_all("td")
-            link = td[0].a
+        for i in pastes:
             row = [
-                link.string,                            # Name
-                link["href"][1:],                       # Key
-                td[2].a.string,                         # Format
-                td[1].string,                           # Time created
-                "http://pastebin.com" + link["href"]    # Link
+                i["name"], i["key"], i["format"], i["time_created"], i["link"]
             ]
             data.append(row)
         
