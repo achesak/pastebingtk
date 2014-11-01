@@ -95,11 +95,8 @@ from resources.dialogs.options_dialog import OptionsDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
-from resources.pastebin_python.pastebin import PastebinPython
-# Import the API exceptions.
-from resources.pastebin_python.pastebin_exceptions import PastebinBadRequestException, PastebinFileException, PastebinHTTPErrorException, PastebinNoPastesException
-# Import the API options.
-from resources.pastebin_python.pastebin_options import OPTION_DELETE, OPTION_LIST, OPTION_PASTE, OPTION_TRENDS, OPTION_USER_DETAILS
+import resources.python_pastebin.pastebin_api as pastebin_api
+import resources.python_pastebin.pastebin_extras as pastebin_extras
 # Import the functions for working with command line arguments.
 import resources.command_line as command_line
 
@@ -192,10 +189,6 @@ class PastebinGTK(Gtk.Window):
         self.user_key = ""
         self.dev_key = config["dev_key"]
         self.login = False
-        
-        # Initalize the PastebinPython API object. This is what is used to
-        # make the API requests to Pastebin.
-        self.api = PastebinPython(api_dev_key = self.dev_key)
         
         # Create the window.
         Gtk.Window.__init__(self, title = TITLE)
@@ -331,14 +324,14 @@ class PastebinGTK(Gtk.Window):
             
             try:
                 # Send the paste.
-                url = self.api.createPaste(api_paste_code = text, api_paste_name = name, api_paste_format = format_, api_paste_private = exposure, api_paste_expire_date = expire)
+                url = pastebin_api.create_paste(config["dev_key"], data = text, name = name, format_ = format_, private = exposure, expire = expire, userkey = self.user_key)
                 
                 # Check for the spam filter, if the user wants that.
                 caught_spam = False
                 if config["check_spam"]:
                     
                     try:
-                        paste = self.api.getPasteRawOutput(api_paste_key = url.rsplit("/", 1)[-1])
+                        paste = pastebin_api.get_paste(pastekey = url.rsplit("/", 1)[-1])
                 
                     except urllib2.URLError:
                         pass # Shouldn't happen, unless the user is an idiot and disconnects from the internet 
@@ -387,10 +380,6 @@ class PastebinGTK(Gtk.Window):
             # Show an error if the paste could not be retrieved. This will occur if the user isn't connected to the internet.
             show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
         
-        except PastebinHTTPErrorException:
-            # Show an error if the paste could not be retreived. This will occur if the key is invalid.
-            show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste key was specifed.")
-            
         else:
             # Delete the current text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())

@@ -4,12 +4,6 @@
 # This file defines the functions for working with command line arguments.
 
 
-# Import the pastebin API wrapper.
-from resources.pastebin_python.pastebin import PastebinPython
-# Import the API exceptions.
-from resources.pastebin_python.pastebin_exceptions import PastebinBadRequestException, PastebinFileException, PastebinHTTPErrorException, PastebinNoPastesException
-# Import the API options.
-from resources.pastebin_python.pastebin_options import OPTION_DELETE, OPTION_LIST, OPTION_PASTE, OPTION_TRENDS, OPTION_USER_DETAILS
 
 
 def upload(args, dev_key):
