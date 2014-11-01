@@ -423,27 +423,27 @@ class PastebinGTK(Gtk.Window):
             show_error_dialog(self, "Delete Paste", "Must be logged in to delete a paste.")
             return
         
+        # Get the list of the user's pastes.
         try:
-            # Get the list of the user's pastes.
-            pastes = self.api.listUserPastes()
-        
-        except PastebinNoPastesException:
-            # If there are no pastes, tell the user.
-            show_alert_dialog(self, "Delete Paste", "The currently logged in user has no pastes.")
-            return
+            pastes = pastebin_api.list_users_pastes(config["dev_key"], self.user_key)
+            
+            # If the user has no pastes, don't continue.
+            if len(pastes) == 0:
+                show_alert_dialog(self, "Delete Paste", "The currently logged in user has no pastes.")
+                return
         
         except urllib2.URLError:
-            show_error_dialog(self, "List User's Pastes", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            show_error_dialog(self, "Delete Paste", "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
         # Create the list of data.
         data = []
         for i in pastes:
             new = []
-            new.append(i["paste_title"])
-            new.append(i["paste_key"])
-            new.append(i["paste_format_long"])
-            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
+            new.append(i["title"])
+            new.append(i["key"])
+            new.append(i["format_long"])
+            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["expire_date"]))))
             data.append(new)
         
         # Get the paste to delete.
@@ -467,22 +467,19 @@ class PastebinGTK(Gtk.Window):
         
         try:
             # Get the paste.
-            paste = self.api.deletePaste(api_paste_key = key)
+            paste = pastebin_api.delete_paste(config["dev_key"], self.user_key, key)
+            print paste
         
         except urllib2.URLError:
             # Show an error if the paste could not be deleted. This will occur if the user isn't connected to the internet.
-            show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that an invalid paste was specified, you are not connected to the internet, or the pastebin.com website is down.")
         
-        except PastebinHTTPErrorException:
-            # Show an error if the paste could not be deleted. This will occur if the key is invalid.
-            show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that an invalid paste key was specifed.")
-            
         else:
-            if paste == True:
+            if paste == "Paste Removed":
                 show_alert_dialog(self, "Delete Paste", "%s was successfully deleted." % ("Paste \"%s\"" % paste_name if paste_name != "" else "Untitled paste"))
             else:
                 show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
-    
+        
     
     def pastebin_login(self, event):
         """Logs the user in."""
@@ -507,15 +504,17 @@ class PastebinGTK(Gtk.Window):
             if user_name != "" and password != "":
                 
                 try:
-                    self.user_key = self.api.createAPIUserKey(user_name, password)
+                    self.user_key = pastebin_api.create_user_key(config["dev_key"], user_name, password)
+                    if self.user_key == "Bad API request, invalid login":
+                        raise TypeError  # Bit of a hack here...
                     self.user_name = user_name
                     self.login = True
                     self.status_lbl.set_text("Logged in as %s." % user_name)
                     show_alert_dialog(self, "Login", "Successfully logged in as %s." % user_name)
                 
-                except PastebinBadRequestException:
+                except TypeError:
+                    self.user_key = ""
                     show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
-                    self.login = False
                 
                 except urllib2.URLError:
                     show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
@@ -537,6 +536,7 @@ class PastebinGTK(Gtk.Window):
         """Logs the user out."""
         
         self.login = False
+        self.user_key = ""
         self.status_lbl.set_text("Not logged in")
         show_alert_dialog(self, "Logout", "You are now logged out.")
     
