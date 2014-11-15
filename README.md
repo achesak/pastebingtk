@@ -1,6 +1,6 @@
 # About PastebinGTK
 
-PastebinGTK is a Linux desktop client for the [pastebin.com](http://pastebin.com/) text sharing service.
+PastebinGTK is a desktop client for the [pastebin.com](http://pastebin.com/) text sharing service.
 
 Among other features, it is able to create,
 read, and delete pastes, as well as list recent pastes and pastes created by a user.
