@@ -782,9 +782,9 @@ class PastebinGTK(Gtk.Window):
             def_expire = opt_dlg.expi_com.get_active_text()
             def_expo = opt_dlg.expo_com.get_active_text()
             line_num = opt_dlg.lin_chk.get_active()
-            syntax = opt_dlg.syn_chk.get_active()
-            syntax_guess = opt_dlg.asyn_chk.get_active()
-            syntax_def = opt_dlg.dsyn_ent.get_text()
+            #syntax = opt_dlg.syn_chk.get_active()
+            #syntax_guess = opt_dlg.asyn_chk.get_active()
+            #syntax_def = opt_dlg.dsyn_ent.get_text()
             dev_key = opt_dlg.devk_ent.get_text()
             
             # Set the values.
@@ -798,9 +798,9 @@ class PastebinGTK(Gtk.Window):
             config["default_expiration"] = def_expire
             config["default_exposure"] = def_expo
             config["line_numbers"] = line_num
-            config["syntax_highlight"] = syntax
-            config["syntax_guess"] = syntax_guess
-            config["syntax_default"] = syntax_def
+            #config["syntax_highlight"] = syntax
+            #config["syntax_guess"] = syntax_guess
+            #config["syntax_default"] = syntax_def
             config["dev_key"] = dev_key
             
             # Update anything that could have changed.
