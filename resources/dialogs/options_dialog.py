@@ -56,6 +56,16 @@ class OptionsDialog(Gtk.Dialog):
         self.spam_chk.set_active(config["check_spam"])
         opt_grid1.attach_next_to(self.spam_chk, self.exit_chk, Gtk.PositionType.BOTTOM, 2, 1)
         
+        # Create the pastes to retrieve label and spinbutton.
+        lnum_lbl = Gtk.Label("Pastes to retrieve: ")
+        lnum_lbl.set_alignment(0, 0.5)
+        opt_grid1.attach_next_to(lnum_lbl, self.spam_chk, Gtk.PositionType.BOTTOM, 1, 1)
+        lnum_adj = Gtk.Adjustment(lower = 1, upper = 1000, step_increment = 1)
+        self.lnum_sbtn = Gtk.SpinButton(digits = 0, adjustment = lnum_adj)
+        self.lnum_sbtn.set_numeric(False)
+        self.lnum_sbtn.set_value(config["pastes_retrieve"])
+        opt_grid1.attach_next_to(self.lnum_sbtn, lnum_lbl, Gtk.PositionType.RIGHT, 1, 1)
+        
         # Create the second grid.
         opt_grid2 = Gtk.Grid()
         opt_grid2_lbl = Gtk.Label("Defaults")

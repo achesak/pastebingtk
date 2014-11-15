@@ -131,7 +131,8 @@ except (IOError, ValueError):
               "syntax_highlight": True,
               "syntax_guess": True,
               "syntax_default": "",
-              "check_spam": True}
+              "check_spam": True,
+              "pastes_retrieve": 50}
 
 # Update the configuration, if necessary.
 if not "line_numbers" in config:
@@ -144,6 +145,8 @@ if not "syntax_default" in config:
     config["syntax_default"] = ""
 if not "check_spam" in config:
     config["check_spam"] = True
+if not "pastes_retrieve" in config:
+    config["pastes_retrieve"] = 50
 
 # Load the last username, if the user wants that.
 if config["remember_username"]:
@@ -553,7 +556,7 @@ class PastebinGTK(Gtk.Window):
         try:
             # Get the list of pastes.
             if source == "user":
-                pastes = pastebin_api.list_users_pastes(self.dev_key, self.user_key)
+                pastes = pastebin_api.list_users_pastes(self.dev_key, self.user_key, results_limit = int(config["pastes_retrieve"]))
             else:
                 pastes = pastebin_api.list_trending_pastes(self.dev_key)
         
@@ -781,6 +784,7 @@ class PastebinGTK(Gtk.Window):
             restore_window = opt_dlg.win_chk.get_active()
             confirm_exit = opt_dlg.exit_chk.get_active()
             check_spam = opt_dlg.spam_chk.get_active()
+            pastes_retrieve = opt_dlg.lnum_sbtn.get_value()
             def_name = opt_dlg.name_ent.get_text()
             def_format = opt_dlg.form_com.get_active_text()
             def_expire = opt_dlg.expi_com.get_active_text()
@@ -797,6 +801,7 @@ class PastebinGTK(Gtk.Window):
             config["restore_window"] = restore_window
             config["confirm_exit"] = confirm_exit
             config["check_spam"] = check_spam
+            config["pastes_retrieve"] = pastes_retrieve
             config["default_name"] = def_name
             config["default_format"] = def_format
             config["default_expiration"] = def_expire
