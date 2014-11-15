@@ -86,7 +86,7 @@ from resources.dialogs.get_dialog import GetPasteDialog
 # Import the delete paste dialog.
 from resources.dialogs.delete_dialog import DeletePasteDialog
 # Import the paste list dialogs.
-from resources.dialogs.list_user_dialog import ListPastesDialog
+from resources.dialogs.list_user_dialog import ListPastesDialog, ListPastesDialog2
 from resources.dialogs.list_recent_dialog import ListRecentDialog
 # Import the user details dialog.
 from resources.dialogs.user_details_dialog import UserDetailsDialog
@@ -554,46 +554,50 @@ class PastebinGTK(Gtk.Window):
         try:
             # Get the list of pastes.
             if source == "user":
-                pastes = self.api.listUserPastes()
+                pastes = pastebin_api.list_users_pastes(self.dev_key, self.user_key)
             else:
-                pastes = self.api.listTrendingPastes()
-        
-        except PastebinNoPastesException:
-            # If there are no pastes, tell the user.
-            show_alert_dialog(self, title1, "The currently logged in user has no pastes.")
-            return
+                pastes = pastebin_api.list_trending_pastes(self.dev_key)
         
         except urllib2.URLError:
             show_error_dialog(self, title1, "Pastes could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
+        if len(pastes) == 0:
+            # If there are no pastes, tell the user.
+            show_alert_dialog(self, title1, "The currently logged in user has no pastes.")
             return
         
         # Create the list of data.
         data = []
         for i in pastes:
             new = []
-            new.append(i["paste_title"])
-            new.append(i["paste_key"])
-            new.append(i["paste_format_long"])
-            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_date"]))))
-            if i["paste_expire_date"] == "0":
+            new.append(i["title"])
+            new.append(i["key"])
+            if source == "user":
+                new.append(i["format_long"])
+            new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["date"]))))
+            if i["expire_date"] == "0":
                 new.append("Never")
             else:
-                new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["paste_expire_date"]))))
-            new.append(exposure[i["paste_private"]])
-            size = int(i["paste_size"])
+                new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["expire_date"]))))
+            new.append(exposure[i["private"]])
+            size = int(i["size"])
             if size < 1000:
                 new.append("%d bytes" % size)
             elif size < 1000 * 1000:
                 new.append("%d kB" % (size / 1000))
             else:
                 new.append("%d MB" % (size / (1000 * 1000)))
-            new.append(i["paste_hits"])
-            new.append(i["paste_url"])
+            new.append(i["hits"])
+            new.append(i["url"])
             
             data.append(new)
         
         # Show the list of pastes.
-        list_dlg = ListPastesDialog(self, title2, data)
+        if source == "user":
+            list_dlg = ListPastesDialog(self, title2, data)
+        else:
+            list_dlg = ListPastesDialog2(self, title2, data)
         response = list_dlg.run()
         model, treeiter = list_dlg.treeview.get_selection().get_selected()
         list_dlg.destroy()
@@ -606,7 +610,8 @@ class PastebinGTK(Gtk.Window):
                 return
             
             # Can't load private pastes due to API restrictions.
-            if model[treeiter][5] == "Private":
+            if (source == "user" and model[treeiter][5] == "Private") or \
+               (source == "trending" and model[treeiter][4] == "Private"):
                 show_alert_dialog(self, title2, "Due to API restrictions PastebinGTK is unable to load private pastes.")
                 return
             
