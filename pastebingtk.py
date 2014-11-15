@@ -75,8 +75,6 @@ sys.dont_write_bytecode = True
 
 # Import the application's UI data.
 from resources.ui import VERSION, TITLE, MENU_DATA
-# Import the dictionaries for the constants and formats.
-from resources.dicts import FORMATS, EXPIRE, EXPOSURE
 # Import the login dialog.
 from resources.dialogs.login_dialog import LoginDialog
 # Import the create paste dialog.
@@ -97,6 +95,7 @@ from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog,
 # Import the pastebin API wrapper.
 import resources.python_pastebin.pastebin_api as pastebin_api
 import resources.python_pastebin.pastebin_extras as pastebin_extras
+from resources.python_pastebin.pastebin_dicts import FORMATS, EXPIRE, EXPOSURE
 
 # Get the main directory.
 if platform.system().lower() == "windows":

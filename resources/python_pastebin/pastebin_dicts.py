@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+# python-pastebin
+# Wrapper of the pastebin.com API for the Python language.
+# Released under the MIT open source license.
 
-# This file defines the dicts.
+# This file contains dicts with constants used by the 
+# pastebin.com API.
 
 
-# Define the formats.
+# Formats: key is full name, value is short name.
 FORMATS = {"4CS": "4cs",
             "6502 ACME Cross Assembler": "6502acme",
             "6502 Kick Assembler": "6502kickass",
@@ -225,7 +229,7 @@ FORMATS = {"4CS": "4cs",
             "Z80 Assembler": "z80",
             "ZXBasic": "zxbasic"}
 
-# Define the expiration constants.
+# Expiration times: key is human-readable, value is used by API.
 EXPIRE = {"Never": "N",
           "10 Minutes": "10M",
           "1 Hour": "1H",
@@ -234,7 +238,7 @@ EXPIRE = {"Never": "N",
           "2 Weeks": "2W",
           "1 Month": "1M"}
 
-# Define the exposure constants.
+# Exposure: key is human-readable, value is used by API.
 EXPOSURE = {"Public": 0,
             "Unlisted": 1,
             "Private": 2}
