@@ -97,8 +97,6 @@ from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog,
 # Import the pastebin API wrapper.
 import resources.python_pastebin.pastebin_api as pastebin_api
 import resources.python_pastebin.pastebin_extras as pastebin_extras
-# Import the functions for working with command line arguments.
-import resources.command_line as command_line
 
 # Get the main directory.
 if platform.system().lower() == "windows":
@@ -892,7 +890,6 @@ class PastebinGTK(Gtk.Window):
         Gtk.main_quit()
 
 
-# If there are no parameters, show the GUI.
 if  __name__ == "__main__" and len(sys.argv) == 1:
     
     # Create the application.
@@ -900,28 +897,3 @@ if  __name__ == "__main__" and len(sys.argv) == 1:
     win.connect("delete-event", win.exit)
     win.show_all()
     Gtk.main()
-
-# If there are parameters specified, run the application from the command line.
-elif __name__ == "__main__" and len(sys.argv) > 1:
-    
-    # Make sure the usage is correct.
-    if len(sys.argv) < 3:
-        print("Usage: python pastebingtk.py [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
-        sys.exit()
-    
-    # Uploading text:
-    if sys.argv[1] == "upload" or sys.argv[1] == "uploadfile":
-        url = command_line.upload(sys.argv, config["dev_key"])
-        print("Paste uploaded: %s" % url)
-    
-    # Downloading text:
-    elif sys.argv[1] == "download" or sys.argv[1] == "downloadfile":
-        text = command_line.download(sys.argv, config["dev_key"])
-        if sys.argv[1] == "download":
-            print(text)
-        else:
-            open(sys.argv[3], "w").write(text)
-    
-    # Other command:
-    else:
-        print("Usage: python pastebingtk.py [mode] [text/file/key] [[title] [format] [exposure] [expiration]]")
