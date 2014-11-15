@@ -319,6 +319,11 @@ class PastebinGTK(Gtk.Window):
         expire = EXPIRE[expire]
         exposure = EXPOSURE[exposure]
         
+        # If the user isn't logged in, they can't create private pastes.
+        if not self.user_key and exposure == 2:
+            show_alert_dialog(self, "Create Paste", "Anonymous users cannot create private pastes.")
+            return
+        
         # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
             
