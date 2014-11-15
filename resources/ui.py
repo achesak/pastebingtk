@@ -6,7 +6,7 @@
 
 # Define the version and the title.
 TITLE = "PastebinGTK"
-VERSION = "1.0"
+VERSION = "1.1"
 
 # Define the menu XML.
 MENU_DATA = """
