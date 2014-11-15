@@ -669,14 +669,32 @@ class PastebinGTK(Gtk.Window):
         
         try:
             # Run the function to get the user's details
-            info = self.api.getUserInfos()
-        
+            info = pastebin_api.get_user_info(self.dev_key, self.user_key)        
         except urllib2.URLError:
             show_error_dialog(self, "Get User's Details", "Details could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
-        # Get the user's details.
-        data = self.api.getUserInfos()
+        # Format the data into the way the dialog uses it.
+        data = [
+            ["Username", info["name"]],
+            ["User URL", "http://pastebin.com/u/" + info["name"]]
+        ]
+        if "email" in info:
+            data.append(["Email", info["email"]])
+        if "website" in info:
+            data.append(["Website", info["website"]])
+        if "location" in info:
+            data.append(["Location", info["location"]])
+        if "avatar_url" in info:
+            data.append(["Avatar URL", info["avatar_url"]])
+        if "account_type" in info:
+            data.append(["Account Type", info["account_type"]])
+        if "format_short" in info:
+            data.append(["Default Format", info["format_short"]])
+        if "expiration" in info:
+            data.append(["Default Expiration", info["expiration"]])
+        if "private" in info:
+            data.append(["Default Exposure", info["private"]])
         
         # Show the user's details.
         user_dlg = UserDetailsDialog(self, "%s's User Details" % self.user_name, data)
