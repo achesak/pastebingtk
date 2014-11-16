@@ -55,11 +55,6 @@ import time
 import json
 # Import webbrowser for opening websites in the user's browser.
 import webbrowser
-# Import HTMLParser for parsing html files.
-try:
-    from HTMLParser import HTMLParser
-except ImportError:
-    from html.parser import HTMLParser
 # Try to import BeautifulSoup. This is needed for getting the list
 # of most recently created pastes. If the user doesn't have it installed,
 # fail as gracefully as possible.
