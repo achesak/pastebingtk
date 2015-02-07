@@ -226,7 +226,7 @@ class PastebinGTK(Gtk.Window):
             ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
             ("logout", None, "Log_out...", "<Shift><Control>l", None, self.pastebin_logout),
             ("user_details", None, "Get Account _Details...", None, None, self.get_user_details),
-            ("check_logins", None, "_Check Account Logins...", None, None, None),
+            ("check_logins", None, "_Check Account Logins...", None, None, self.check_logins),
             ("check_messages", None, "Check Account _Messages...", None, None, None)
         ])
         action_group.add_actions([
@@ -671,19 +671,54 @@ class PastebinGTK(Gtk.Window):
             self.get_paste(event = None, key = key)
     
     
+    def check_logins(self, event):
+        """Gets a list of the user's most recent logins."""
+        
+        # If BeautifulSoup is not installed, this feature won't work.
+        if not bs4_installed:
+            show_alert_dialog(self, "List Recent Pastes", "This feature requires the BeautifulSoup 4 HTML parsing library to be installed.")
+            return
+        
+        # Get the list of most recent logins.
+        try:
+            logins = pastebin_extras.list_logins()
+        
+        except urllib2.URLError:
+            show_error_dialog(self, "List Account Logins", "Logins could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
+        # If we got a False, the user isn't logged in on the site.
+        if logins == False: # Explictly check here, for the edge case of an empty list.
+            show_error_dialog(self, "List Account Logins", "User must be logged in on pastebin.com to check the list of logins.")
+            return
+        
+        # Reformat the data into something the dialog can use.
+        data = []
+        for i in logins:
+            row = [
+                i["date"], i["ip"], i["type"]
+            ]
+            data.append(row)
+        
+        # Show the list of logins.
+        list_dlg = ListLoginsDialog(self, "List Recent Pastes", data)
+        response = list_dlg.run()
+        list_dlg.destroy()
+    
+    
     def get_user_details(self, event):
         """Gets the user's information and settings."""
         
         # The user must be logged in to do this.
         if not self.login:
-            show_error_dialog(self, "Get User's Details", "Must be logged in to view a user's details.")
+            show_error_dialog(self, "Get Account Details", "Must be logged in to view a user's details.")
             return
         
         try:
             # Run the function to get the user's details
             info = pastebin_api.get_user_info(self.dev_key, self.user_key)        
         except urllib2.URLError:
-            show_error_dialog(self, "Get User's Details", "Details could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            show_error_dialog(self, "Get Account Details", "Details could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
         
         # Format the data into the way the dialog uses it.
@@ -709,7 +744,7 @@ class PastebinGTK(Gtk.Window):
             data.append(["Default Exposure", info["private"]])
         
         # Show the user's details.
-        user_dlg = UserDetailsDialog(self, "%s's User Details" % self.user_name, data)
+        user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data)
         response = user_dlg.run()
         user_dlg.destroy()
         

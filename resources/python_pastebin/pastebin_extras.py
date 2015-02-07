@@ -78,3 +78,32 @@ def list_recent_pastes():
         data.append(row)
     
     return data
+
+
+def list_logins():
+    """Gets a list of the user's most recent logins."""
+    
+    response = urlopen("http://pastebin.com/sessions")
+    html = response.read()
+    response.close()
+    
+    if "To get to the requested page you must first login." in html:
+        return False # Bad way to test, FIXME.
+    
+    parser = BeautifulSoup(html)
+    data = []
+    
+    # Structure: Body > Table > TR > data stored in TD
+    rows = parser.find("body").find("table", {"class": "maintable"}).find_all("tr")
+    for i in rows:
+        if len(i.find_all("th")) > 0:
+            continue
+        td = i.find_all("td")
+        row = {
+            "date": td[0],
+            "ip": td[1],
+            "type": td[2]
+        }
+        data.append(row)
+    
+    return data
