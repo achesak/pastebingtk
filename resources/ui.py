@@ -21,12 +21,16 @@ MENU_DATA = """
       <menuitem action="list_users_pastes" />
       <menuitem action="list_recent_pastes" />
       <separator />
+      <menuitem action="quit" />
+    </menu>
+    <menu action="user_menu">
       <menuitem action="login" />
       <menuitem action="logout" />
       <separator />
       <menuitem action="user_details" />
       <separator />
-      <menuitem action="quit" />
+      <menuitem action="check_logins" />
+      <menuitem action="check_messages" />
     </menu>
     <menu action="text_menu">
       <menuitem action="save" />

@@ -85,6 +85,8 @@ from resources.dialogs.list_recent_dialog import ListRecentDialog
 from resources.dialogs.user_details_dialog import UserDetailsDialog
 # Import the options dialog.
 from resources.dialogs.options_dialog import OptionsDialog
+# Import the list logins dialog.
+from resources.dialogs.list_logins_dialog import ListLoginsDialog
 # Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 # Import the pastebin API wrapper.
@@ -217,10 +219,15 @@ class PastebinGTK(Gtk.Window):
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, lambda x: self.list_pastes(source = "trending")),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, lambda x: self.list_pastes(source = "user")),
             ("list_recent_pastes", None, "List _Recent Pastes...", "<Control>r", None, self.list_recent),
-            ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
-            ("logout", None, "Logo_ut...", "<Shift><Control>l", None, self.pastebin_logout),
-            ("user_details", None, "G_et User's Details...", None, None, self.get_user_details),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
+        ])
+        action_group.add_actions([
+            ("user_menu", None, "_User"),
+            ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
+            ("logout", None, "Log_out...", "<Shift><Control>l", None, self.pastebin_logout),
+            ("user_details", None, "Get Account _Details...", None, None, self.get_user_details),
+            ("check_logins", None, "_Check Account Logins...", None, None, None),
+            ("check_messages", None, "Check Account _Messages...", None, None, None)
         ])
         action_group.add_actions([
             ("text_menu", None, "_Text"),
