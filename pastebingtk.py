@@ -672,6 +672,14 @@ class PastebinGTK(Gtk.Window):
     def get_user_details(self, event):
         """Gets the user's information and settings."""
         
+        ACCOUNT_PRIVACY = {"0": "Public",
+                           "1": "Unlisted",
+                           "2": "Private"
+        }
+        ACCOUNT_TYPE = {"0": "Normal",
+                        "1": "Pro"
+        }
+        
         # The user must be logged in to do this.
         if not self.login:
             show_error_dialog(self, "Get Account Details", "Must be logged in to view a user's details.")
@@ -698,13 +706,13 @@ class PastebinGTK(Gtk.Window):
         if "avatar_url" in info:
             data.append(["Avatar URL", info["avatar_url"]])
         if "account_type" in info:
-            data.append(["Account Type", info["account_type"]])
+            data.append(["Account Type", ACCOUNT_TYPE[info["account_type"]]])
         if "format_short" in info:
             data.append(["Default Format", info["format_short"]])
         if "expiration" in info:
             data.append(["Default Expiration", info["expiration"]])
         if "private" in info:
-            data.append(["Default Exposure", info["private"]])
+            data.append(["Default Exposure", ACCOUNT_PRIVACY[info["private"]]])
         
         # Show the user's details.
         user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data)

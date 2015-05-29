@@ -164,7 +164,8 @@ def get_user_info(devkey, userkey):
     info = {
         "name": root.find("user_name").text,
         "avatar_url": root.find("user_avatar_url").text,
-        "account_type": root.find("user_account_type").text}
+        "account_type": root.find("user_account_type").text
+    }
     if root.find("user_format_short"):
         info["format_short"] = root.find("user_format_short").text
     if root.find("user_expiration"):
