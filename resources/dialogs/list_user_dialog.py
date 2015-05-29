@@ -18,7 +18,7 @@ class ListPastesDialog(Gtk.Dialog):
         self.set_default_size(950, 300)
         
         # Add the buttons.
-        self.add_button("Get Paste", 9)
+        self.get_btn = self.add_button("Get Paste", 9)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
         # Create the ListStore for storing the data.
@@ -75,8 +75,17 @@ class ListPastesDialog(Gtk.Dialog):
         for i in data:
             self.liststore.append(i)
         
+        # Connect the treeview for double clicks.
+        self.treeview.connect("row-activated", self.activate)
+        
         # Show the dialog. There's no need to get the response.
         self.show_all()
+    
+    
+    def activate(self, treeiter, path, user_data):
+        """Sends a click event to the button to load a paste."""
+        
+        self.get_btn.clicked()
 
 
 class ListPastesDialog2(Gtk.Dialog):
@@ -89,7 +98,7 @@ class ListPastesDialog2(Gtk.Dialog):
         self.set_default_size(950, 300)
         
         # Add the buttons.
-        self.add_button("Get Paste", 9)
+        self.get_btn = self.add_button("Get Paste", 9)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
         # Create the ListStore for storing the data.
@@ -142,5 +151,14 @@ class ListPastesDialog2(Gtk.Dialog):
         for i in data:
             self.liststore.append(i)
         
+        # Connect the treeview for double clicks.
+        self.treeview.connect("row-activated", self.activate)
+        
         # Show the dialog. There's no need to get the response.
         self.show_all()
+    
+    
+    def activate(self, treeiter, path, user_data):
+        """Sends a click event to the button to load a paste."""
+        
+        self.get_btn.clicked()
