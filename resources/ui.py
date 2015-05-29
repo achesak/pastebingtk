@@ -28,9 +28,6 @@ MENU_DATA = """
       <menuitem action="logout" />
       <separator />
       <menuitem action="user_details" />
-      <separator />
-      <menuitem action="check_logins" />
-      <menuitem action="check_messages" />
     </menu>
     <menu action="text_menu">
       <menuitem action="save" />
