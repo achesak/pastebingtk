@@ -452,7 +452,6 @@ class PastebinGTK(Gtk.Window):
                 self.login = False
         
         else:
-            show_alert_dialog(self, "Login", "No username or password specified.\n\nNot logged in.")
             self.login = False
             
         # Close the dialog.
