@@ -217,7 +217,7 @@ class PastebinGTK(Gtk.Window):
         exposure = new_dlg.expo_com.get_active_text()
         new_dlg.destroy()
         
-        # Get the values as needed.
+        # Get the paste values.
         format_ = FORMATS[format_]
         expire = EXPIRE[expire]
         exposure = EXPOSURE[exposure]
@@ -353,7 +353,6 @@ class PastebinGTK(Gtk.Window):
         try:
             # Get the paste.
             paste = pastebin_api.delete_paste(self.config["dev_key"], self.user_key, key)
-            print paste
         
         except urllib2.URLError:
             # Show an error if the paste could not be deleted. This will occur if the user isn't connected to the internet.
@@ -469,7 +468,10 @@ class PastebinGTK(Gtk.Window):
         data = []
         for i in pastes:
             new = []
-            new.append(i["title"])
+            if not i["title"]:
+                new.append("Untitled")
+            else:
+                new.append(i["title"])
             new.append(i["key"])
             if source == "user":
                 new.append(i["format_long"])
