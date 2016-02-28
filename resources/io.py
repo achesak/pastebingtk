@@ -17,8 +17,6 @@ def save_file(filename, data):
         data_file.close()
         
     except IOError:
-        # Show the error message.
-        # This only shows if the error occurred when writing to the file.
         print("Error writing to file (IOError).")
 
 
@@ -32,8 +30,6 @@ def read_file(filename):
         data_file.close()
         
     except IOError:
-        # Show the error message.
-        # This only shows if the error occurred when reading from the file.
         print("Error reading from file (IOError).")
     
     return data
@@ -48,8 +44,6 @@ def save_window_size(main_dir, height, width):
         wins_file.close()
     
     except IOError:
-        # Show the error message if something happened, but continue.
-        # This one is shown if there was an error writing to the file.
         print("Error saving window size file (IOError).")
 
 
@@ -62,13 +56,9 @@ def save_config(main_dir, config):
         config_file.close()
         
     except IOError:
-        # Show the error message if something happened, but continue.
-        # This one is shown if there was an error writing to the file.
         print("Error saving configuration file (IOError).")
     
     except (TypeError, ValueError):
-        # Show the error message if something happened, but continue.
-        # This one is shown if there was an error with the data type.
         print("Error saving configuration file (TypeError or ValueError).")
 
 
@@ -83,6 +73,4 @@ def save_username(main_dir, config, username):
             user_file.close()
         
         except IOError:
-            # Show the error message if something happened, but continue.
-            # This one is shown if there was an error writing to the file.
             print("Error saving username file (IOError).")

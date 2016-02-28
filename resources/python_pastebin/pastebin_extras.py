@@ -78,3 +78,27 @@ def list_recent_pastes():
         data.append(row)
     
     return data
+
+
+def get_paste_info(url):
+    """Gets info on a paste (by URL)."""
+    
+    response = urlopen(url)
+    html = response.read()
+    response.close()
+    
+    parser = BeautifulSoup(html)
+    data = {}
+    
+    # Structure: Body > Div:paste_box_info > Div:paste_box_line1/2
+    content = parser.find("body").find("div", {"class": "paste_box_info"})
+    box_line1 = content.find("div", {"class": "paste_box_line1"})
+    box_line2 = content.find("div", {"class": "paste_box_line2"})
+    
+    data["title"] = box_line1.find("h1").string.strip()
+    data["username"] = box_line2.find("a").string.strip()
+    data["uploaded"] = box_line2.find("span").string.strip()
+    data["views"] = box_line2.find("img", {"class": "t_vi"}).next_sibling.strip()
+    data["delete"] = box_line2.find("img", {"class": "t_ex"}).next_sibling.strip()
+    
+    return data

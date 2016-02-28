@@ -18,6 +18,8 @@ MENU_DATA = """
       <menuitem action="get_paste" />
       <menuitem action="delete_paste" />
       <separator />
+      <menuitem action="get_paste_info" />
+      <separator />
       <menuitem action="list_trending_pastes" />
       <menuitem action="list_users_pastes" />
       <menuitem action="list_recent_pastes" />
@@ -38,8 +40,6 @@ MENU_DATA = """
       <menuitem action="options" />
     </menu>
     <menu action="help_menu">
-      <menuitem action="help" />
-      <separator />
       <menuitem action="about" />
     </menu>
   </menubar>

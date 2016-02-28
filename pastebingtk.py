@@ -135,6 +135,7 @@ class PastebinGTK(Gtk.Window):
             ("create_paste", Gtk.STOCK_GO_UP, "_Create Paste...", "<Control>n", "Create a new paste", self.create_paste),
             ("get_paste", Gtk.STOCK_GO_DOWN, "_Get Paste...", "<Control>g", "Get a paste", self.get_paste),
             ("delete_paste", Gtk.STOCK_DELETE, "_Delete Paste...", "<Control>d", "Delete a paste", self.delete_paste),
+            ("get_paste_info", None, "Get Paste _Info...", "<Control>i", None, self.get_paste_info),
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, lambda x: self.list_pastes(source = "trending")),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, lambda x: self.list_pastes(source = "user")),
             ("list_recent_pastes", None, "List _Recent Pastes...", "<Control>r", None, self.list_recent),
@@ -157,8 +158,7 @@ class PastebinGTK(Gtk.Window):
         ])
         action_group.add_actions([
             ("help_menu", None, "_Help"),
-            ("help", None, "_Help...", "F1", None, self.show_help),
-            ("about", None, "_About...", "<Shift>F1", None, self.show_about),
+            ("about", None, "_About...", "F1", None, self.show_about)
         ])
         
         # Set up the menus.
@@ -364,7 +364,18 @@ class PastebinGTK(Gtk.Window):
                 show_alert_dialog(self, "Delete Paste", "%s was successfully deleted." % ("Paste \"%s\"" % paste_name if paste_name != "" else "Untitled paste"))
             else:
                 show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
+    
+    
+    def get_paste_info(self, event):
+        """Gets info on a provided paste."""
         
+        # If BeautifulSoup is not installed, this feature won't work.
+        if not bs4_installed:
+            show_alert_dialog(self, "Get Paste Info", "This feature requires the BeautifulSoup 4 HTML parsing library to be installed.")
+            return
+        
+        print(pastebin_extras.get_paste_info("http://pastebin.com/kdFTQ4WW"))
+    
     
     def pastebin_login(self, event):
         """Logs the user in."""
@@ -686,13 +697,6 @@ class PastebinGTK(Gtk.Window):
         
         # Close the dialog.
         opt_dlg.destroy()
-    
-    
-    def show_help(self, event):
-        """Shows the help."""
-        
-        # Open the help in the user's web browser.
-        webbrowser.open("resources/help/help.html")
     
     
     def show_about(self, event):

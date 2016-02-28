@@ -40,5 +40,12 @@ class LoginDialog(Gtk.Dialog):
         self.pass_ent.set_visibility(False)
         new_grid.attach_next_to(self.pass_ent, pass_lbl, Gtk.PositionType.RIGHT, 1, 1)
         
+        # Connect 'Enter' key to the OK button.
+        self.name_ent.set_activates_default(True)
+        self.pass_ent.set_activates_default(True)
+        ok_btn = self.get_widget_for_response(response_id = Gtk.ResponseType.OK)
+        ok_btn.set_can_default(True)
+        ok_btn.grab_default()
+        
         # Show the dialog.
         self.show_all()
