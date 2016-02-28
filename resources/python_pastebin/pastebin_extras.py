@@ -102,3 +102,25 @@ def get_paste_info(url):
     data["delete"] = box_line2.find("img", {"class": "t_ex"}).next_sibling.strip()
     
     return data
+
+
+def get_user_details_extra(username):
+    """Gets extra details from a user page."""
+    
+    response = urlopen("http://pastebin.com/u/" + username)
+    html = response.read()
+    response.close()
+    
+    parser = BeautifulSoup(html)
+    
+    # Structure: Body > Div:paste_box_frame > Div:paste_box_line_u2
+    content = parser.find("body").find("div", {"class": "paste_box_frame"}).find("div", {"class": "paste_box_line_u2"})
+    view_imgs = content.find_all("img", {"class": "t_vi"})
+    
+    data = [
+        ["Profile views", view_imgs[0].next_sibling.strip()],
+        ["Total paste views", view_imgs[1].next_sibling.strip()],
+        ["Join date", content.find("span")["title"]]
+    ]
+    
+    return data

@@ -639,6 +639,11 @@ class PastebinGTK(Gtk.Window):
         if "private" in info:
             data.append(["Default Exposure", ACCOUNT_PRIVACY[info["private"]]])
         
+        # If Beautiful Soup is installed, get some extra info.
+        if bs4_installed:
+			extra_info = pastebin_extras.get_user_details_extra(self.user_name)
+			data += extra_info
+        
         # Show the user's details.
         user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data)
         response = user_dlg.run()
