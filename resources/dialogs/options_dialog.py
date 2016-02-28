@@ -13,18 +13,15 @@ class OptionsDialog(Gtk.Dialog):
     def __init__(self, parent, config):
         """Create the dialog."""
         
-        # This window should be modal.
+        # Create the dialog.
         Gtk.Dialog.__init__(self, "Options", parent, Gtk.DialogFlags.MODAL)
         self.set_resizable(False)
+        self.add_button("Cancel", Gtk.ResponseType.CANCEL)
+        self.add_button("OK", Gtk.ResponseType.OK)
         
         # Create the notebook.
         notebook = Gtk.Notebook()
-        # Set tab position to top.
         notebook.set_tab_pos(Gtk.PositionType.TOP)
-        
-        # Add the buttons.
-        self.add_button("Cancel", Gtk.ResponseType.CANCEL)
-        self.add_button("OK", Gtk.ResponseType.OK)
         
         # Create the first grid.
         opt_box = self.get_content_area()
@@ -117,24 +114,6 @@ class OptionsDialog(Gtk.Dialog):
         self.lin_chk.set_active(config["line_numbers"])
         opt_grid3.attach(self.lin_chk, 0, 0, 2, 1)
         
-        # Create the enable syntax highlighting checkbox.
-        #self.syn_chk = Gtk.CheckButton("Enable syntax highlighting")
-        #self.syn_chk.set_active(config["syntax_highlight"])
-        #opt_grid3.attach_next_to(self.syn_chk, self.lin_chk, Gtk.PositionType.BOTTOM, 2, 1)
-        
-        # Create the automatically guess language checkbox.
-        #self.asyn_chk = Gtk.CheckButton("Automatically guess language")
-        #self.asyn_chk.set_active(config["syntax_guess"])
-        #opt_grid3.attach_next_to(self.asyn_chk, self.syn_chk, Gtk.PositionType.BOTTOM, 2, 1)
-        
-        # Create the default syntax highlighting label and entry.
-        #dsyn_lbl = Gtk.Label("Default syntax highlighting: ")
-        #dsyn_lbl.set_alignment(0, 0.5)
-        #opt_grid3.attach_next_to(dsyn_lbl, self.asyn_chk, Gtk.PositionType.BOTTOM, 1, 1)
-        #self.dsyn_ent = Gtk.Entry()
-        #self.dsyn_ent.set_text(config["syntax_default"])
-        #opt_grid3.attach_next_to(self.dsyn_ent, dsyn_lbl, Gtk.PositionType.RIGHT, 1, 1)
-        
         # Create the fourth grid.
         opt_grid4 = Gtk.Grid()
         opt_grid4_lbl = Gtk.Label("Technical")
@@ -160,6 +139,5 @@ class OptionsDialog(Gtk.Dialog):
         notebook.append_page(opt_grid3, opt_grid3_lbl)
         notebook.append_page(opt_grid4, opt_grid4_lbl)
         
-        # Show the dialog. The response gets handled by the function
-        # in the main class.
+        # Show the dialog.
         self.show_all()

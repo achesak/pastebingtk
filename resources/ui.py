@@ -4,9 +4,10 @@
 # This file defines variables used by the UI.
 
 
-# Define the version and the title.
+# Define the application variables.
 TITLE = "PastebinGTK"
 VERSION = "1.2"
+ICON_PATH = "resources/images/icon.png"
 
 # Define the menu XML.
 MENU_DATA = """

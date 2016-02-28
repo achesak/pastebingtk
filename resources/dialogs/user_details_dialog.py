@@ -13,33 +13,26 @@ class UserDetailsDialog(Gtk.Dialog):
     def __init__(self, parent, title, data):
         """Create the dialog."""
         
-        # This window should be modal.
+        # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(400, 300)
-        
-        # Add the buttons.
         self.add_button("View Profile", 9)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
-        # Create the ListStore for storing the data.
+        # Create the columns.
         self.liststore = Gtk.ListStore(str, str)
-        
-        # Create the TreeView for displaying the data.
         self.treeview = Gtk.TreeView(model = self.liststore)
-        # Create the Field column.
         field_text = Gtk.CellRendererText()
         field_col = Gtk.TreeViewColumn("Field", field_text, text = 0)
         self.treeview.append_column(field_col)
-        # Create the Value column.
         value_text = Gtk.CellRendererText()
         value_col = Gtk.TreeViewColumn("Value", value_text, text = 1)
         self.treeview.append_column(value_col)
         
-        # Create the ScrolledWindow for displaying the list with a scrollbar.
+        # Build the interface.
         scrolled_win = Gtk.ScrolledWindow()
         scrolled_win.set_hexpand(True)
         scrolled_win.set_vexpand(True)
-        # Display the TreeView.
         scrolled_win.add(self.treeview)
         self.get_content_area().add(scrolled_win)
         
@@ -47,5 +40,5 @@ class UserDetailsDialog(Gtk.Dialog):
         for i in data:
             self.liststore.append(i)
         
-        # Show the dialog. There's no need to get the response.
+        # Show the dialog.
         self.show_all()

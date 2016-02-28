@@ -14,18 +14,15 @@ class CreatePasteDialog(Gtk.Dialog):
     def __init__(self, parent):
         """Create the dialog."""
         
-        # This window should be modal.
+        # Create the dialog.
         Gtk.Dialog.__init__(self, "Create Paste", parent, Gtk.DialogFlags.MODAL)
         self.set_resizable(False)
-        
-        # Add the buttons.
         self.add_button("Cancel", Gtk.ResponseType.CANCEL)
         self.add_button("OK", Gtk.ResponseType.OK)
         
         # Create the grid.
         new_box = self.get_content_area()
         new_grid = Gtk.Grid()
-        # Add the grid to the dialog's content area.
         new_box.add(new_grid)
         
         # Create the name label and entry.
@@ -65,6 +62,5 @@ class CreatePasteDialog(Gtk.Dialog):
         self.expo_com.set_active(0)
         new_grid.attach_next_to(self.expo_com, expo_lbl, Gtk.PositionType.RIGHT, 1, 1)
         
-        # Show the dialog. The response gets handled by the function
-        # in the main class.
+        # Show the dialog.
         self.show_all()

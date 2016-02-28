@@ -34,27 +34,16 @@ THE SOFTWARE.
 ################################################################################
 
 
-# Import any needed modules.
-# Import Gtk and Gdk for the interface.
-from gi.repository import Gtk, Gdk, GdkPixbuf, Pango
-# Import GtkSource for the sourceview widget.
-from gi.repository import GtkSource
-# Import sys for closing the application and getting command line arguments.
+# Import GTK and Python lib modules.
+from gi.repository import Gtk, Gdk, GdkPixbuf, Pango, GtkSource
 import sys
-# Import os for various things.
 import os
-# Import platform for getting the user's OS.
-import platform
-# Import webbrowser for opening webpages.
 import webbrowser
-# Import urllib2 for working with urls.
 import urllib2
-# Import time for working with time.
 import time
-# Import json for loading and saving the configuration file.
 import json
-# Import webbrowser for opening websites in the user's browser.
 import webbrowser
+
 # Try to import BeautifulSoup. This is needed for getting the list
 # of most recently created pastes. If the user doesn't have it installed,
 # fail as gracefully as possible.
@@ -68,129 +57,59 @@ except ImportError:
 # This line can be removed be the user, if desired.
 sys.dont_write_bytecode = True
 
-# Import the application's UI data.
-from resources.ui import VERSION, TITLE, MENU_DATA
-# Import the login dialog.
+# Import the application modules
+from resources.ui import *
+import resources.launch as launch
+import resources.io as io
+
+# Import the dialogs.
 from resources.dialogs.login_dialog import LoginDialog
-# Import the create paste dialog.
 from resources.dialogs.create_dialog import CreatePasteDialog
-# Import the get paste dialog.
 from resources.dialogs.get_dialog import GetPasteDialog
-# Import the delete paste dialog.
 from resources.dialogs.delete_dialog import DeletePasteDialog
-# Import the paste list dialogs.
 from resources.dialogs.list_user_dialog import ListPastesDialog, ListPastesDialog2
 from resources.dialogs.list_recent_dialog import ListRecentDialog
-# Import the user details dialog.
 from resources.dialogs.user_details_dialog import UserDetailsDialog
-# Import the options dialog.
 from resources.dialogs.options_dialog import OptionsDialog
-# Import the list logins dialog.
-from resources.dialogs.list_logins_dialog import ListLoginsDialog
-# Import the miscellaneous dialogs.
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
+
 # Import the pastebin API wrapper.
 import resources.python_pastebin.pastebin_api as pastebin_api
 import resources.python_pastebin.pastebin_extras as pastebin_extras
 from resources.python_pastebin.pastebin_dicts import FORMATS, EXPIRE, EXPOSURE
 
-# Get the main directory.
-if platform.system().lower() == "windows":
-    main_dir = "C:\\.pastebingtk"
-else:
-    main_dir = "%s/.pastebingtk" % os.path.expanduser("~")
-
-# Check to see if the directory exists, and create it if it doesn't.
-if not os.path.exists(main_dir) or not os.path.isdir(main_dir):
-    
-    # Create the directory.
-    os.makedirs(main_dir)
-
-# Get the configuration.
-try:
-    # Load the configuration file.
-    config_file = open("%s/config" % main_dir, "r")
-    config = json.load(config_file)
-    config_file.close()
-
-except (IOError, ValueError):
-    # Set the defaults and continue.
-    config = {"dev_key": "d2314ff616133e54f728918b8af1500e",
-              "prompt_login": True,
-              "remember_username": True,
-              "restore_window": True,
-              "confirm_exit": False,
-              "default_name": "",
-              "default_format": "None",
-              "default_expiration": "Never",
-              "default_exposure": "Public",
-              "line_numbers": True,
-              "syntax_highlight": True,
-              "syntax_guess": True,
-              "syntax_default": "",
-              "check_spam": True,
-              "pastes_retrieve": 50}
-
-# Update the configuration, if necessary.
-if not "line_numbers" in config:
-    config["line_numbers"] = True
-if not "syntax_highlight" in config:
-    config["syntax_highlight"] = True
-if not "syntax_guess" in config:
-    config["syntax_guess"] = True
-if not "syntax_default" in config:
-    config["syntax_default"] = ""
-if not "check_spam" in config:
-    config["check_spam"] = True
-if not "pastes_retrieve" in config:
-    config["pastes_retrieve"] = 50
-
-# Load the last username, if the user wants that.
-if config["remember_username"]:
-    
-    try:
-        user_file = open("%s/username" % main_dir, "r")
-        username = user_file.read()
-        user_file.close()
-    
-    except IOError:
-        username = ""
-
-# Get the previous window size.
-try:
-    wins_file = open("%s/window_size" % main_dir, "r")
-    last_width = int(wins_file.readline())
-    last_height = int(wins_file.readline())
-    wins_file.close()
-
-except IOError:
-    last_width = 700
-    last_height = 500
-
-# If the user doesn't want to restore the window size, set the size to the default.
-if not config["restore_window"]:
-    last_width = 700
-    last_height = 500
-
 
 class PastebinGTK(Gtk.Window):
-    """Create the application class."""
 
     def __init__(self):
-        """Create the application."""
+        """Creates the application."""
         
-        # Variables for remembering user data.
-        self.user_name = ""
-        if config["remember_username"]:
-            self.user_name = username
+        # Application data:
+        self.main_dir = launch.get_main_dir()
+        self.config = launch.get_config(self.main_dir)
+        self.last_width, self.last_height = launch.get_window_size(self.main_dir, self.config)
+        
+        # Variables for remembering user data:
+        self.user_name = launch.get_last_username(self.main_dir, self.config)
         self.user_key = ""
-        self.dev_key = config["dev_key"]
+        self.dev_key = self.config["dev_key"]
         self.login = False
+        
+        # Show the interface.
+        self.create_ui()
+        
+        # Get the user login details, if they want that.
+        if self.config["prompt_login"]:
+            self.pastebin_login("ignore")
+    
+    
+    def create_ui(self):
+        """Builds the interface."""
         
         # Create the window.
         Gtk.Window.__init__(self, title = TITLE)
-        self.set_default_size(last_width, last_height)
-        self.set_icon_from_file("resources/images/icon.png")
+        self.set_default_size(self.last_width, self.last_height)
+        self.set_icon_from_file(ICON_PATH)
         
         # Build the UI.
         scrolled_window = Gtk.ScrolledWindow()
@@ -206,7 +125,7 @@ class PastebinGTK(Gtk.Window):
         self.text_view.modify_font(self.font)
         
         # Show line numbers, if the user wants that.
-        if config["line_numbers"]:
+        if self.config["line_numbers"]:
             self.text_view.set_show_line_numbers(True)
         
         # Create the menus.
@@ -249,7 +168,7 @@ class PastebinGTK(Gtk.Window):
         self.add_accel_group(accel_group)
         ui_manager.insert_action_group(action_group)
         
-        # Create the grid for the UI and add the UI items.
+        # Set up and show the interface.
         grid = Gtk.Grid()
         menubar = ui_manager.get_widget("/menubar")
         grid.add(menubar)
@@ -259,35 +178,19 @@ class PastebinGTK(Gtk.Window):
         self.status_lbl = Gtk.Label("Not logged in")
         self.status_lbl.set_alignment(0, 0.5)
         grid.attach_next_to(self.status_lbl, scrolled_window, Gtk.PositionType.BOTTOM, 1, 1)
-        
-        # Add the grid to the main window.
         self.add(grid)
         self.show_all()
         
         # Bind the events.
         self.connect("delete-event", self.delete_event)
-        
-        # Get the user login details, if they want that.
-        if config["prompt_login"]:
-            self.pastebin_login("ignore")
     
     
     def delete_event(self, widget, event):
         """Saves the window size."""
         
-        # Get the current window size.
+        # Save the current window size.
         height, width = self.get_size()
-        
-        # Save the window size.
-        try:
-            wins_file = open("%s/window_size" % main_dir, "w")
-            wins_file.write("%d\n%d" % (height, width))
-            wins_file.close()
-        
-        except IOError:
-            # Show the error message if something happened, but continue.
-            # This one is shown if there was an error writing to the file.
-            print("Error saving window size file (IOError).")
+        io.save_window_size(self.main_dir, height, width)
     
     
     def create_paste(self, event):
@@ -303,10 +206,10 @@ class PastebinGTK(Gtk.Window):
         
         # Get the name, format, expiration, and exposure for the paste.
         new_dlg = CreatePasteDialog(self)
-        new_dlg.name_ent.set_text(config["default_name"])
-        new_dlg.form_com.set_active(["None", "4CS", "6502 ACME Cross Assembler", "6502 Kick Assembler", "6502 TASM/64TASS", "ABAP", "ActionScript", "ActionScript 3", "Ada", "ALGOL 68", "Apache Log", "AppleScript", "APT Sources", "ARM", "ASM (NASM)", "ASP", "Asymptote", "autoconf", "Autohotkey", "AutoIt", "Avisynth", "Awk", "BASCOM AVR", "Bash", "Basic4GL", "BibTeX", "Blitz Basic", "BNF", "BOO", "BrainFuck", "C", "C for Macs", "C Intermediate Language", "C#", "C++", "C++ (with QT extensions)", "C: Loadrunner", "CAD DCL", "CAD Lisp", "CFDG", "ChaiScript", "Clojure", "Clone C", "Clone C++", "CMake", "COBOL", "CoffeeScript", "ColdFusion", "CSS", "Cuesheet", "D", "DCL", "DCPU-16", "DCS", "Delphi", "Delphi Prism (Oxygene)", "Diff", "DIV", "DOS", "DOT", "E", "ECMAScript", "Eiffel", "Email", "EPC", "Erlang", "F#", "Falcon", "FO Language", "Formula One", "Fortran", "FreeBasic", "FreeSWITCH", "GAMBAS", "Game Maker", "GDB", "Genero", "Genie", "GetText", "Go", "Groovy", "GwBasic", "Haskell", "Haxe", "HicEst", "HQ9 Plus", "HTML", "HTML 5", "Icon", "IDL", "INI file", "Inno Script", "INTERCAL", "IO", "J", "Java", "Java 5", "JavaScript", "jQuery", "KiXtart", "Latex", "LDIF", "Liberty BASIC", "Linden Scripting", "Lisp", "LLVM", "Loco Basic", "Logtalk", "LOL Code", "Lotus Formulas", "Lotus Script", "LScript", "Lua", "M68000 Assembler", "MagikSF", "Make", "MapBasic", "MatLab", "mIRC", "MIX Assembler", "Modula 2", "Modula 3", "Motorola 68000 HiSoft Dev", "MPASM", "MXML", "MySQL", "Nagios", "newLISP", "NullSoft Installer", "Oberon 2", "Objeck Programming Langua", "Objective C", "OCalm Brief", "OCaml", "Octave", "OpenBSD PACKET FILTER", "OpenGL Shading", "Openoffice BASIC", "Oracle 11", "Oracle 8", "Oz", "ParaSail", "PARI/GP", "Pascal", "PAWN", "PCRE", "Per", "Perl", "Perl 6", "PHP", "PHP Brief", "Pic 16", "Pike", "Pixel Bender", "PL/SQL", "PostgreSQL", "POV-Ray", "Power Shell", "PowerBuilder", "ProFTPd", "Progress", "Prolog", "Properties", "ProvideX", "PureBasic", "PyCon", "Python", "Python for S60", "q/kdb+", "QBasic", "R", "Rails", "REBOL", "REG", "Rexx", "Robots", "RPM Spec", "Ruby", "Ruby Gnuplot", "SAS", "Scala", "Scheme", "Scilab", "SdlBasic", "Smalltalk", "Smarty", "SPARK", "SPARQL", "SQL", "StoneScript", "SystemVerilog", "T-SQL", "TCL", "Tera Term", "thinBasic", "TypoScript", "Unicon", "UnrealScript", "UPC", "Urbi", "Vala", "VB.NET", "Vedit", "VeriLog", "VHDL", "VIM", "Visual Pro Log", "VisualBasic", "VisualFoxPro", "WhiteSpace", "WHOIS", "Winbatch", "XBasic", "XML", "Xorg Config", "XPP", "YAML", "Z80 Assembler", "ZXBasic"].index(config["default_format"]))
-        new_dlg.expi_com.set_active(["Never", "10 Minutes", "1 Hour", "1 Day", "1 Week", "2 Weeks", "1 Month"].index(config["default_expiration"]))
-        new_dlg.expo_com.set_active(["Public", "Unlisted", "Private"].index(config["default_exposure"]))
+        new_dlg.name_ent.set_text(self.config["default_name"])
+        new_dlg.form_com.set_active(["None", "4CS", "6502 ACME Cross Assembler", "6502 Kick Assembler", "6502 TASM/64TASS", "ABAP", "ActionScript", "ActionScript 3", "Ada", "ALGOL 68", "Apache Log", "AppleScript", "APT Sources", "ARM", "ASM (NASM)", "ASP", "Asymptote", "autoconf", "Autohotkey", "AutoIt", "Avisynth", "Awk", "BASCOM AVR", "Bash", "Basic4GL", "BibTeX", "Blitz Basic", "BNF", "BOO", "BrainFuck", "C", "C for Macs", "C Intermediate Language", "C#", "C++", "C++ (with QT extensions)", "C: Loadrunner", "CAD DCL", "CAD Lisp", "CFDG", "ChaiScript", "Clojure", "Clone C", "Clone C++", "CMake", "COBOL", "CoffeeScript", "ColdFusion", "CSS", "Cuesheet", "D", "DCL", "DCPU-16", "DCS", "Delphi", "Delphi Prism (Oxygene)", "Diff", "DIV", "DOS", "DOT", "E", "ECMAScript", "Eiffel", "Email", "EPC", "Erlang", "F#", "Falcon", "FO Language", "Formula One", "Fortran", "FreeBasic", "FreeSWITCH", "GAMBAS", "Game Maker", "GDB", "Genero", "Genie", "GetText", "Go", "Groovy", "GwBasic", "Haskell", "Haxe", "HicEst", "HQ9 Plus", "HTML", "HTML 5", "Icon", "IDL", "INI file", "Inno Script", "INTERCAL", "IO", "J", "Java", "Java 5", "JavaScript", "jQuery", "KiXtart", "Latex", "LDIF", "Liberty BASIC", "Linden Scripting", "Lisp", "LLVM", "Loco Basic", "Logtalk", "LOL Code", "Lotus Formulas", "Lotus Script", "LScript", "Lua", "M68000 Assembler", "MagikSF", "Make", "MapBasic", "MatLab", "mIRC", "MIX Assembler", "Modula 2", "Modula 3", "Motorola 68000 HiSoft Dev", "MPASM", "MXML", "MySQL", "Nagios", "newLISP", "NullSoft Installer", "Oberon 2", "Objeck Programming Langua", "Objective C", "OCalm Brief", "OCaml", "Octave", "OpenBSD PACKET FILTER", "OpenGL Shading", "Openoffice BASIC", "Oracle 11", "Oracle 8", "Oz", "ParaSail", "PARI/GP", "Pascal", "PAWN", "PCRE", "Per", "Perl", "Perl 6", "PHP", "PHP Brief", "Pic 16", "Pike", "Pixel Bender", "PL/SQL", "PostgreSQL", "POV-Ray", "Power Shell", "PowerBuilder", "ProFTPd", "Progress", "Prolog", "Properties", "ProvideX", "PureBasic", "PyCon", "Python", "Python for S60", "q/kdb+", "QBasic", "R", "Rails", "REBOL", "REG", "Rexx", "Robots", "RPM Spec", "Ruby", "Ruby Gnuplot", "SAS", "Scala", "Scheme", "Scilab", "SdlBasic", "Smalltalk", "Smarty", "SPARK", "SPARQL", "SQL", "StoneScript", "SystemVerilog", "T-SQL", "TCL", "Tera Term", "thinBasic", "TypoScript", "Unicon", "UnrealScript", "UPC", "Urbi", "Vala", "VB.NET", "Vedit", "VeriLog", "VHDL", "VIM", "Visual Pro Log", "VisualBasic", "VisualFoxPro", "WhiteSpace", "WHOIS", "Winbatch", "XBasic", "XML", "Xorg Config", "XPP", "YAML", "Z80 Assembler", "ZXBasic"].index(self.config["default_format"]))
+        new_dlg.expi_com.set_active(["Never", "10 Minutes", "1 Hour", "1 Day", "1 Week", "2 Weeks", "1 Month"].index(self.config["default_expiration"]))
+        new_dlg.expo_com.set_active(["Public", "Unlisted", "Private"].index(self.config["default_exposure"]))
         response = new_dlg.run()
         name = new_dlg.name_ent.get_text()
         format_ = new_dlg.form_com.get_active_text()
@@ -329,18 +232,17 @@ class PastebinGTK(Gtk.Window):
             
             try:
                 # Send the paste.
-                url = pastebin_api.create_paste(config["dev_key"], data = text, name = name, format_ = format_, private = exposure, expire = expire, userkey = self.user_key)
+                url = pastebin_api.create_paste(self.config["dev_key"], data = text, name = name, format_ = format_, private = exposure, expire = expire, userkey = self.user_key)
                 
                 # Check for the spam filter, if the user wants that.
                 caught_spam = False
-                if config["check_spam"]:
+                if self.config["check_spam"]:
                     
                     try:
                         paste = pastebin_api.get_paste(pastekey = url.rsplit("/", 1)[-1])
                 
                     except urllib2.URLError:
-                        pass # Shouldn't happen, unless the user is an idiot and disconnects from the internet 
-                             # sometime between uploading the paste and now.
+                        pass
                     
                     else:
                         # Check if the paste doesn't match.
@@ -396,28 +298,6 @@ class PastebinGTK(Gtk.Window):
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
             self.text_buffer.insert(self.text_buffer.get_start_iter(), paste)
             self.text_buffer.place_cursor(self.text_buffer.get_start_iter())
-            
-            # Guess the language, if the user wants that.
-            if config["syntax_highlight"] and config["syntax_guess"]:
-                pass
-                
-                # THIS IS A WORKAROUND WHERE IT REQUIRES A FILE TO DETECT A LANGUAGE
-                # TODO: MAKE THIS NO LONGER REQUIRE A FILE
-                
-                # Create the temporary file.
-                #temp_file = open("pastebingtk.temp", "w")
-                #temp_file.write(paste)
-                #temp_file.close()
-                
-                # Guess and set the language.
-                #language = self.language_manager.guess_language("pastebingtk.temp", None)
-                #print self.language_manager.get_language_ids()
-                #print language
-                #self.text_buffer.set_highlight_syntax(True)
-                #self.text_buffer.set_language("python")
-                
-                # Cleanup the temporary file.
-                #os.remove("pastebingtk.temp")
         
     
     def delete_paste(self, event):
@@ -430,7 +310,7 @@ class PastebinGTK(Gtk.Window):
         
         # Get the list of the user's pastes.
         try:
-            pastes = pastebin_api.list_users_pastes(config["dev_key"], self.user_key)
+            pastes = pastebin_api.list_users_pastes(self.config["dev_key"], self.user_key)
             
             # If the user has no pastes, don't continue.
             if len(pastes) == 0:
@@ -472,7 +352,7 @@ class PastebinGTK(Gtk.Window):
         
         try:
             # Get the paste.
-            paste = pastebin_api.delete_paste(config["dev_key"], self.user_key, key)
+            paste = pastebin_api.delete_paste(self.config["dev_key"], self.user_key, key)
             print paste
         
         except urllib2.URLError:
@@ -496,7 +376,7 @@ class PastebinGTK(Gtk.Window):
         
         # Get the username and password.
         login_dlg = LoginDialog(self)
-        if config["remember_username"]:
+        if self.config["remember_username"]:
             login_dlg.name_ent.set_text(self.user_name)
         response = login_dlg.run()
         user_name = login_dlg.name_ent.get_text()
@@ -509,7 +389,7 @@ class PastebinGTK(Gtk.Window):
             if user_name != "" and password != "":
                 
                 try:
-                    self.user_key = pastebin_api.create_user_key(config["dev_key"], user_name, password)
+                    self.user_key = pastebin_api.create_user_key(self.config["dev_key"], user_name, password)
                     if self.user_key == "Bad API request, invalid login":
                         raise TypeError  # Bit of a hack here...
                     self.user_name = user_name
@@ -561,7 +441,7 @@ class PastebinGTK(Gtk.Window):
         try:
             # Get the list of pastes.
             if source == "user":
-                pastes = pastebin_api.list_users_pastes(self.dev_key, self.user_key, results_limit = int(config["pastes_retrieve"]))
+                pastes = pastebin_api.list_users_pastes(self.dev_key, self.user_key, results_limit = int(self.config["pastes_retrieve"]))
             else:
                 pastes = pastebin_api.list_trending_pastes(self.dev_key)
         
@@ -738,15 +618,7 @@ class PastebinGTK(Gtk.Window):
         if response == Gtk.ResponseType.OK:
             
             # Save the data.
-            try:
-                data_file = open(filename, "w")
-                data_file.write(self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False))
-                data_file.close()
-                
-            except IOError:
-                # Show the error message.
-                # This only shows if the error occurred when writing to the file.
-                print("Error writing to file (IOError).")
+            io.save_file(filename, self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False))
     
     
     def open_file(self, event):
@@ -763,15 +635,7 @@ class PastebinGTK(Gtk.Window):
         if response == Gtk.ResponseType.OK:
             
             # Read the data.
-            try:
-                data_file = open(filename, "r")
-                data = data_file.read()
-                data_file.close()
-                
-            except IOError:
-                # Show the error message.
-                # This only shows if the error occurred when reading from the file.
-                print("Error reading from file (IOError).")
+            data = io.read_file(filename)
             
             # Delete the old text and insert the new.
             self.text_buffer.delete(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter())
@@ -782,10 +646,8 @@ class PastebinGTK(Gtk.Window):
     def options(self, event):
         """Shows the Options dialog."""
         
-        global config
-        
         # Get the new options.
-        opt_dlg = OptionsDialog(self, config)
+        opt_dlg = OptionsDialog(self, self.config)
         response = opt_dlg.run()
         
         # If the user pressed OK:
@@ -803,27 +665,21 @@ class PastebinGTK(Gtk.Window):
             def_expire = opt_dlg.expi_com.get_active_text()
             def_expo = opt_dlg.expo_com.get_active_text()
             line_num = opt_dlg.lin_chk.get_active()
-            #syntax = opt_dlg.syn_chk.get_active()
-            #syntax_guess = opt_dlg.asyn_chk.get_active()
-            #syntax_def = opt_dlg.dsyn_ent.get_text()
             dev_key = opt_dlg.devk_ent.get_text()
             
             # Set the values.
-            config["prompt_login"] = login
-            config["remember_username"] = username
-            config["restore_window"] = restore_window
-            config["confirm_exit"] = confirm_exit
-            config["check_spam"] = check_spam
-            config["pastes_retrieve"] = pastes_retrieve
-            config["default_name"] = def_name
-            config["default_format"] = def_format
-            config["default_expiration"] = def_expire
-            config["default_exposure"] = def_expo
-            config["line_numbers"] = line_num
-            #config["syntax_highlight"] = syntax
-            #config["syntax_guess"] = syntax_guess
-            #config["syntax_default"] = syntax_def
-            config["dev_key"] = dev_key
+            self.config["prompt_login"] = login
+            self.config["remember_username"] = username
+            self.config["restore_window"] = restore_window
+            self.config["confirm_exit"] = confirm_exit
+            self.config["check_spam"] = check_spam
+            self.config["pastes_retrieve"] = pastes_retrieve
+            self.config["default_name"] = def_name
+            self.config["default_format"] = def_format
+            self.config["default_expiration"] = def_expire
+            self.config["default_exposure"] = def_expo
+            self.config["line_numbers"] = line_num
+            self.config["dev_key"] = dev_key
             
             # Update anything that could have changed.
             self.text_view.set_show_line_numbers(line_num)
@@ -860,7 +716,7 @@ class PastebinGTK(Gtk.Window):
         about_dlg.set_logo(pixbuf)
         about_dlg.set_version(VERSION)
         about_dlg.set_comments("PastebinGTK is a desktop client for pastebin.com.")
-        about_dlg.set_copyright("Copyright (c) 2013-2014 Adam Chesak")
+        about_dlg.set_copyright("Copyright (c) 2013-2016 Adam Chesak")
         about_dlg.set_authors(["Adam Chesak <achesak@yahoo.com>"])
         about_dlg.set_license(license_text)
         about_dlg.set_website("http://poultryandprogramming.wordpress.com/")
@@ -873,40 +729,17 @@ class PastebinGTK(Gtk.Window):
     def exit(self, x, y):
         """Closes the application."""
         
-        # Confirm that the user wants to quit, if they want that.
-        if config["confirm_exit"]:
+        # Confirm that the user wants to quit:
+        if self.config["confirm_exit"]:
             conf_exit = show_question_dialog(self, "Exit", "Are you sure you want to exit?")
             if conf_exit != Gtk.ResponseType.OK:
                 return True
         
         # Save the configuration.
-        try:
-            config_file = open("%s/config" % main_dir, "w")
-            json.dump(config, config_file)
-            config_file.close()
-            
-        except IOError:
-            # Show the error message if something happened, but continue.
-            # This one is shown if there was an error writing to the file.
-            print("Error saving configuration file (IOError).")
+        io.save_config(self.main_dir, self.config)
         
-        except (TypeError, ValueError):
-            # Show the error message if something happened, but continue.
-            # This one is shown if there was an error with the data type.
-            print("Error saving configuration file (TypeError or ValueError).")
-        
-        # Save the last username, if the user wants that.
-        if config["remember_username"]:
-            
-            try:
-                user_file = open("%s/username" % main_dir, "w")
-                user_file.write(self.user_name)
-                user_file.close()
-            
-            except IOError:
-                # Show the error message if something happened, but continue.
-                # This one is shown if there was an error writing to the file.
-                print("Error saving username file (IOError).")
+        # Save the last username.
+        io.save_username(self.main_dir, self.config, self.user_name)
         
         # Close the application.
         Gtk.main_quit()
