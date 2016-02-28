@@ -71,7 +71,7 @@ def list_recent_pastes():
         row = {
             "name": link.string,
             "key": link["href"][1:],
-            "format": td[2].a.string,
+            "format": td[2].string,
             "time_created": td[1].string,
             "link": "http://pastebin.com" + link["href"]
         }
