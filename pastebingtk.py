@@ -373,8 +373,40 @@ class PastebinGTK(Gtk.Window):
             show_alert_dialog(self, "Get Paste Info", "This feature requires the BeautifulSoup 4 HTML parsing library to be installed.")
             return
         
-        print(pastebin_extras.get_paste_info("http://pastebin.com/kdFTQ4WW"))
+        # Get the key.
+        get_dlg = GetPasteDialog(self, title = "Get Paste Info")
+        response = get_dlg.run()
+        key = get_dlg.key_ent.get_text()
+        if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
+            key = key.rsplit("/", 1)[-1]
+        get_dlg.destroy()
+        print key
+        print "http://pastebin.com/" + key
     
+        # If the user did not click OK, don't continue.
+        if response != Gtk.ResponseType.OK:
+            return
+        
+        # Get the paste info.
+        try:
+            info = pastebin_extras.get_paste_info("http://pastebin.com/" + key)
+        except urllib2.URLError:
+            show_error_dialog(self, "Get Paste Info", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+            return
+        
+        data = [
+            ["Name", info["name"]],
+            ["Uploaded by", info["username"]],
+            ["Views", info["views"]],
+            ["Upload time", info["uploaded"]],
+            ["Delete time", info["delete"]]
+        ]
+        
+        # Show the paste info.
+        paste_dlg = UserDetailsDialog(self, "Paste Info for " + key, data)
+        response = paste_dlg.run()
+        paste_dlg.destroy()
+        
     
     def pastebin_login(self, event):
         """Logs the user in."""

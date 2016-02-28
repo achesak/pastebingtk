@@ -16,7 +16,8 @@ class UserDetailsDialog(Gtk.Dialog):
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(400, 300)
-        self.add_button("View Profile", 9)
+        if not title.startswith("Paste"):
+            self.add_button("View Profile", 9)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
         # Create the columns.

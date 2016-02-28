@@ -95,7 +95,7 @@ def get_paste_info(url):
     box_line1 = content.find("div", {"class": "paste_box_line1"})
     box_line2 = content.find("div", {"class": "paste_box_line2"})
     
-    data["title"] = box_line1.find("h1").string.strip()
+    data["name"] = box_line1.find("h1").string.strip()
     data["username"] = box_line2.find("a").string.strip()
     data["uploaded"] = box_line2.find("span").string.strip()
     data["views"] = box_line2.find("img", {"class": "t_vi"}).next_sibling.strip()
