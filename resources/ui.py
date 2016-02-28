@@ -6,7 +6,7 @@
 
 # Define the application variables.
 TITLE = "PastebinGTK"
-VERSION = "1.2"
+VERSION = "1.3"
 ICON_PATH = "resources/images/icon.png"
 
 # Define the menu XML.
