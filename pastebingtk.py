@@ -35,6 +35,9 @@ THE SOFTWARE.
 
 
 # Import GTK and Python lib modules.
+import gi
+gi.require_version("Gtk", "3.0")
+gi.require_version("GtkSource", "3.0")
 from gi.repository import Gtk, Gdk, GdkPixbuf, Pango, GtkSource
 import sys
 import os
