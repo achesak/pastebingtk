@@ -11,6 +11,8 @@
       <menuitem action="list_users_pastes" />
       <menuitem action="list_recent_pastes" />
       <separator />
+      <menuitem action="options" />
+      <separator />
       <menuitem action="quit" />
     </menu>
     <menu action="user_menu">
@@ -22,9 +24,6 @@
     <menu action="text_menu">
       <menuitem action="save" />
       <menuitem action="open" />
-    </menu>
-    <menu action="options_menu">
-      <menuitem action="options" />
     </menu>
     <menu action="help_menu">
       <menuitem action="about" />
