@@ -69,7 +69,8 @@ from resources.dialogs.login_dialog import LoginDialog
 from resources.dialogs.create_dialog import CreatePasteDialog
 from resources.dialogs.get_dialog import GetPasteDialog
 from resources.dialogs.delete_dialog import DeletePasteDialog
-from resources.dialogs.list_user_dialog import ListPastesDialog, ListPastesDialog2
+from resources.dialogs.list_user_dialog import ListUserPastesDialog
+from resources.dialogs.list_trending_dialog import ListTrendingPastesDialog
 from resources.dialogs.list_recent_dialog import ListRecentDialog
 from resources.dialogs.user_details_dialog import UserDetailsDialog
 from resources.dialogs.options_dialog import OptionsDialog
@@ -515,9 +516,9 @@ class PastebinGTK(Gtk.Window):
         
         # Show the list of pastes.
         if source == "user":
-            list_dlg = ListPastesDialog(self, title2, data)
+            list_dlg = ListUserPastesDialog(self, title2, data)
         else:
-            list_dlg = ListPastesDialog2(self, title2, data)
+            list_dlg = ListTrendingPastesDialog(self, title2, data)
         response = list_dlg.run()
         model, treeiter = list_dlg.treeview.get_selection().get_selected()
         list_dlg.destroy()
