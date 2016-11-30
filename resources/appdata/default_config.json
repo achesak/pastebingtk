@@ -1,0 +1,17 @@
+{
+      "dev_key": "",
+      "prompt_login": true,
+      "remember_username": true,
+      "restore_window": true,
+      "confirm_exit": false,
+      "default_name": "",
+      "default_format": "None",
+      "default_expiration": "Never",
+      "default_exposure": "Public",
+      "line_numbers": true,
+      "syntax_highlight": true,
+      "syntax_guess": true,
+      "syntax_default": "",
+      "check_spam": true,
+      "pastes_retrieve": 50
+}

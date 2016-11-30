@@ -1,16 +1,3 @@
-# -*- coding: utf-8 -*-
-
-
-# This file defines variables used by the UI.
-
-
-# Define the application variables.
-TITLE = "PastebinGTK"
-VERSION = "1.3"
-ICON_PATH = "resources/images/icon.png"
-
-# Define the menu XML.
-MENU_DATA = """
 <ui>
   <menubar name="menubar">
     <menu action="pastebin_menu">
@@ -52,4 +39,3 @@ MENU_DATA = """
     <toolitem action="open" />
   </toolbar>
 </ui>
-"""

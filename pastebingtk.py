@@ -61,7 +61,6 @@ except ImportError:
 sys.dont_write_bytecode = True
 
 # Import the application modules
-from resources.ui import *
 import resources.launch as launch
 import resources.io as io
 
@@ -89,11 +88,17 @@ class PastebinGTK(Gtk.Window):
         
         # Application data:
         self.main_dir = launch.get_main_dir()
-        self.config = launch.get_config(self.main_dir)
-        self.last_width, self.last_height = launch.get_window_size(self.main_dir, self.config)
+        self.config = io.get_config(self.main_dir)
+        self.application_data = io.get_application_data(self.main_dir)
+        self.last_width = self.application_data["width"]
+        self.last_height = self.application_data["height"]
+
+        # UI data:
+        self.ui_data = io.get_ui_data()
+        self.menu_data = io.get_menu_data()
         
         # Variables for remembering user data:
-        self.user_name = launch.get_last_username(self.main_dir, self.config)
+        self.user_name = self.application_data["username"]
         self.user_key = ""
         self.dev_key = self.config["dev_key"]
         self.login = False
@@ -110,9 +115,9 @@ class PastebinGTK(Gtk.Window):
         """Builds the interface."""
         
         # Create the window.
-        Gtk.Window.__init__(self, title = TITLE)
+        Gtk.Window.__init__(self, title = self.ui_data["title"])
         self.set_default_size(self.last_width, self.last_height)
-        self.set_icon_from_file(ICON_PATH)
+        self.set_icon_from_file(self.ui_data["icon_path"])
         
         # Build the UI.
         scrolled_window = Gtk.ScrolledWindow()
@@ -166,7 +171,7 @@ class PastebinGTK(Gtk.Window):
         
         # Set up the menus.
         ui_manager = Gtk.UIManager()
-        ui_manager.add_ui_from_string(MENU_DATA)
+        ui_manager.add_ui_from_string(self.menu_data)
         accel_group = ui_manager.get_accel_group()
         self.add_accel_group(accel_group)
         ui_manager.insert_action_group(action_group)
@@ -192,8 +197,8 @@ class PastebinGTK(Gtk.Window):
         """Saves the window size."""
         
         # Save the current window size.
-        height, width = self.get_size()
-        io.save_window_size(self.main_dir, height, width)
+        width, height = self.get_size()
+        io.save_application_data(self.main_dir, self.config, width, height, self.user_name)
     
     
     def create_paste(self, event):
@@ -742,7 +747,7 @@ class PastebinGTK(Gtk.Window):
         """Shows the About dialog."""
         
         # Load the icon.
-        img_file = open("resources/images/icon.png", "rb")
+        img_file = open(self.ui_data["icon_path"], "rb")
         img_bin = img_file.read()
         img_file.close()
         loader = GdkPixbuf.PixbufLoader.new_with_type("png")
@@ -754,10 +759,10 @@ class PastebinGTK(Gtk.Window):
         about_dlg = Gtk.AboutDialog()
         
         # Set the details.
-        about_dlg.set_title("About " + TITLE)
-        about_dlg.set_program_name(TITLE)
+        about_dlg.set_title("About " + self.ui_data["title"])
+        about_dlg.set_program_name(self.ui_data["title"])
         about_dlg.set_logo(pixbuf)
-        about_dlg.set_version(VERSION)
+        about_dlg.set_version(self.ui_data["version"])
         about_dlg.set_comments("PastebinGTK is a desktop client for pastebin.com.")
         about_dlg.set_copyright("Copyright (c) 2013-2016 Adam Chesak")
         about_dlg.set_authors(["Adam Chesak <achesak@yahoo.com>"])
@@ -780,9 +785,6 @@ class PastebinGTK(Gtk.Window):
         
         # Save the configuration.
         io.save_config(self.main_dir, self.config)
-        
-        # Save the last username.
-        io.save_username(self.main_dir, self.config, self.user_name)
         
         # Close the application.
         Gtk.main_quit()
