@@ -105,7 +105,7 @@ def get_config(main_dir):
     except (TypeError, ValueError) as e:
         print("get_config(): Error reading config file (TypeError or ValueError):\n%sContinuing with default..." % e)
     
-    return config
+    return config, default_config
 
 
 def get_application_data(main_dir):

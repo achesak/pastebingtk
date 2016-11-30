@@ -88,7 +88,7 @@ class PastebinGTK(Gtk.Window):
         
         # Application data:
         self.main_dir = launch.get_main_dir()
-        self.config = io.get_config(self.main_dir)
+        self.config, self.default_config = io.get_config(self.main_dir)
         self.application_data = io.get_application_data(self.main_dir)
         self.last_width = self.application_data["width"]
         self.last_height = self.application_data["height"]
@@ -129,7 +129,7 @@ class PastebinGTK(Gtk.Window):
         scrolled_window.add(self.text_view)
         
         # Set the font to the system default monospaced.
-        self.font = Pango.FontDescription("Courier New")
+        self.font = Pango.FontDescription("monospace")
         self.text_view.modify_font(self.font)
         
         # Show line numbers, if the user wants that.
@@ -702,48 +702,30 @@ class PastebinGTK(Gtk.Window):
         opt_dlg = OptionsDialog(self, self.config)
         response = opt_dlg.run()
         
-        # If the user pressed OK:
         if response == Gtk.ResponseType.OK:
-            
-            # Get the values.
-            login = opt_dlg.log_chk.get_active()
-            username = opt_dlg.user_chk.get_active()
-            restore_window = opt_dlg.win_chk.get_active()
-            confirm_exit = opt_dlg.exit_chk.get_active()
-            check_spam = opt_dlg.spam_chk.get_active()
-            pastes_retrieve = opt_dlg.lnum_sbtn.get_value()
-            def_name = opt_dlg.name_ent.get_text()
-            def_format = opt_dlg.form_com.get_active_text()
-            def_expire = opt_dlg.expi_com.get_active_text()
-            def_expo = opt_dlg.expo_com.get_active_text()
-            line_num = opt_dlg.lin_chk.get_active()
-            dev_key = opt_dlg.devk_ent.get_text()
-            
+
             # Set the values.
-            self.config["prompt_login"] = login
-            self.config["remember_username"] = username
-            self.config["restore_window"] = restore_window
-            self.config["confirm_exit"] = confirm_exit
-            self.config["check_spam"] = check_spam
-            self.config["pastes_retrieve"] = pastes_retrieve
-            self.config["default_name"] = def_name
-            self.config["default_format"] = def_format
-            self.config["default_expiration"] = def_expire
-            self.config["default_exposure"] = def_expo
-            self.config["line_numbers"] = line_num
-            self.config["dev_key"] = dev_key
+            self.config["prompt_login"] = opt_dlg.log_chk.get_active()
+            self.config["remember_username"] = opt_dlg.user_chk.get_active()
+            self.config["restore_window"] = opt_dlg.win_chk.get_active()
+            self.config["confirm_exit"] = opt_dlg.exit_chk.get_active()
+            self.config["check_spam"] = opt_dlg.spam_chk.get_active()
+            self.config["pastes_retrieve"] = opt_dlg.lnum_sbtn.get_value()
+            self.config["default_name"] = opt_dlg.name_ent.get_text()
+            self.config["default_format"] = opt_dlg.form_com.get_active_text()
+            self.config["default_expiration"] = opt_dlg.expi_com.get_active_text()
+            self.config["default_exposure"] = opt_dlg.expo_com.get_active_text()
+            self.config["line_numbers"] = opt_dlg.lin_chk.get_active()
+            self.config["dev_key"] = opt_dlg.devk_ent.get_text()
             
-            # Update anything that could have changed.
             self.text_view.set_show_line_numbers(line_num)
         
-        # Close the dialog.
         opt_dlg.destroy()
     
     
     def show_about(self, event):
         """Shows the About dialog."""
         
-        # Load the icon.
         img_file = open(self.ui_data["icon_path"], "rb")
         img_bin = img_file.read()
         img_file.close()
@@ -752,10 +734,7 @@ class PastebinGTK(Gtk.Window):
         loader.close()
         pixbuf = loader.get_pixbuf()
         
-        # Create the dialog.
         about_dlg = Gtk.AboutDialog()
-        
-        # Set the details.
         about_dlg.set_title("About " + self.ui_data["title"])
         about_dlg.set_program_name(self.ui_data["title"])
         about_dlg.set_logo(pixbuf)
@@ -766,8 +745,6 @@ class PastebinGTK(Gtk.Window):
         about_dlg.set_license(license_text)
         about_dlg.set_website("http://poultryandprogramming.wordpress.com/")
         about_dlg.set_website_label("http://poultryandprogramming.wordpress.com/")
-        
-        # Show the dialog.
         about_dlg.show_all()
     
     
@@ -783,13 +760,11 @@ class PastebinGTK(Gtk.Window):
         # Save the configuration.
         io.save_config(self.main_dir, self.config)
         
-        # Close the application.
         Gtk.main_quit()
 
 
 if  __name__ == "__main__" and len(sys.argv) == 1:
     
-    # Create the application.
     win = PastebinGTK()
     win.connect("delete-event", win.exit)
     win.show_all()
