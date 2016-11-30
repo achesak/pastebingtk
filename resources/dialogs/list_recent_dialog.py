@@ -15,7 +15,7 @@ class ListRecentDialog(Gtk.Dialog):
         
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
-        self.set_default_size(950, 300)
+        self.set_default_size(1200, 500)
         self.get_btn = self.add_button("Get Paste", 9)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
@@ -35,7 +35,7 @@ class ListRecentDialog(Gtk.Dialog):
         time_col = Gtk.TreeViewColumn("Time Created", time_text, text = 3)
         self.treeview.append_column(time_col)
         link_text = Gtk.CellRendererText()
-        link_col = Gtk.TreeViewColumn("Link", link_text, text = 4)
+        link_col = Gtk.TreeViewColumn("URL", link_text, text = 4)
         self.treeview.append_column(link_col)
         
         # Build the interface.

@@ -383,8 +383,6 @@ class PastebinGTK(Gtk.Window):
         if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
             key = key.rsplit("/", 1)[-1]
         get_dlg.destroy()
-        print key
-        print "http://pastebin.com/" + key
     
         # If the user did not click OK, don't continue.
         if response != Gtk.ResponseType.OK:
@@ -574,7 +572,7 @@ class PastebinGTK(Gtk.Window):
         data = []
         for i in pastes:
             row = [
-                i["name"], i["key"], i["format"], i["time_created"], i["link"]
+                i["name"], i["key"], i["format"] if i["format"] != "-" else "Unknown", i["time_created"], i["link"]
             ]
             data.append(row)
         
