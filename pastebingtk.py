@@ -431,7 +431,6 @@ class PastebinGTK(Gtk.Window):
                     self.user_name = user_name
                     self.login = True
                     self.status_lbl.set_text("Logged in as %s." % user_name)
-                    show_alert_dialog(self, "Login", "Successfully logged in as %s." % user_name)
                 
                 except TypeError:
                     self.user_key = ""
