@@ -192,8 +192,7 @@ class PastebinGTK(Gtk.Window):
     
     def delete_event(self, widget, event):
         """Saves the window size."""
-        
-        # Save the current window size.
+
         width, height = self.get_size()
         io.save_application_data(self.main_dir, self.config, width, height, self.user_name)
     
@@ -279,8 +278,7 @@ class PastebinGTK(Gtk.Window):
             if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
                 key = key.rsplit("/", 1)[-1]
             get_dlg.destroy()
-        
-            # If the user did not click OK, don't continue.
+
             if response != Gtk.ResponseType.OK:
                 return
         
@@ -289,7 +287,6 @@ class PastebinGTK(Gtk.Window):
             paste = pastebin_api.get_paste(pastekey = key)
         
         except urllib2.URLError:
-            # Show an error if the paste could not be retrieved. This will occur if the user isn't connected to the internet.
             show_error_dialog(self, "Get Paste", "Paste could not be retrieved.\n\nThis likely means that an invalid paste was specified, you are not connected to the internet, or the pastebin.com website is down.")
         
         else:
@@ -308,7 +305,6 @@ class PastebinGTK(Gtk.Window):
     def delete_paste(self, event):
         """Deletes an existing paste."""
         
-        # The user must be logged in to do this.
         if not self.login:
             show_error_dialog(self, "Delete Paste", "Must be logged in to delete a paste.")
             return
@@ -317,7 +313,6 @@ class PastebinGTK(Gtk.Window):
         try:
             pastes = pastebin_api.list_users_pastes(self.config["dev_key"], self.user_key)
             
-            # If the user has no pastes, don't continue.
             if len(pastes) == 0:
                 show_alert_dialog(self, "Delete Paste", "The currently logged in user has no pastes.")
                 return
@@ -342,7 +337,6 @@ class PastebinGTK(Gtk.Window):
         model, treeiter = del_dlg.treeview.get_selection().get_selected()
         del_dlg.destroy()
         
-        # If the user did not press OK or nothing was selected, don't continue.
         if response != Gtk.ResponseType.OK or treeiter == None:
             return
         
@@ -360,7 +354,6 @@ class PastebinGTK(Gtk.Window):
             paste = pastebin_api.delete_paste(self.config["dev_key"], self.user_key, key)
         
         except urllib2.URLError:
-            # Show an error if the paste could not be deleted. This will occur if the user isn't connected to the internet.
             show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that an invalid paste was specified, you are not connected to the internet, or the pastebin.com website is down.")
         
         else:
@@ -373,7 +366,6 @@ class PastebinGTK(Gtk.Window):
     def get_paste_info(self, event):
         """Gets info on a provided paste."""
         
-        # If BeautifulSoup is not installed, this feature won't work.
         if not bs4_installed:
             show_alert_dialog(self, "Get Paste Info", "This feature requires the BeautifulSoup 4 HTML parsing library to be installed.")
             return
@@ -386,7 +378,6 @@ class PastebinGTK(Gtk.Window):
             key = key.rsplit("/", 1)[-1]
         get_dlg.destroy()
     
-        # If the user did not click OK, don't continue.
         if response != Gtk.ResponseType.OK:
             return
         
@@ -414,7 +405,6 @@ class PastebinGTK(Gtk.Window):
     def pastebin_login(self, event):
         """Logs the user in."""
         
-        # If the user is alread logged in, don't continue.
         if self.login:
             show_alert_dialog(self, "Login", "Already logged in as %s." % self.user_name)
             return
@@ -426,8 +416,8 @@ class PastebinGTK(Gtk.Window):
         response = login_dlg.run()
         user_name = login_dlg.name_ent.get_text()
         password = login_dlg.pass_ent.get_text()
+        login_dlg.destroy()
         
-        # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
             
             # If the username and password are valid, get the user key
@@ -436,7 +426,7 @@ class PastebinGTK(Gtk.Window):
                 try:
                     self.user_key = pastebin_api.create_user_key(self.config["dev_key"], user_name, password)
                     if self.user_key == "Bad API request, invalid login":
-                        raise TypeError  # Bit of a hack here...
+                        raise TypeError
                     self.user_name = user_name
                     self.login = True
                     self.status_lbl.set_text("Logged in as %s." % user_name)
@@ -456,9 +446,6 @@ class PastebinGTK(Gtk.Window):
         
         else:
             self.login = False
-            
-        # Close the dialog.
-        login_dlg.destroy()
     
     
     def pastebin_logout(self, event):
@@ -494,7 +481,6 @@ class PastebinGTK(Gtk.Window):
             return
         
         if len(pastes) == 0:
-            # If there are no pastes, tell the user.
             show_alert_dialog(self, title1, "The currently logged in user has no pastes.")
             return
         
@@ -539,7 +525,6 @@ class PastebinGTK(Gtk.Window):
         # If the user clicked "Get Paste", load the selected paste.
         if response == 9:
             
-            # If nothing was selected, don't continue.
             if treeiter == None:
                 return
             
@@ -557,7 +542,6 @@ class PastebinGTK(Gtk.Window):
     def list_recent(self, event):
         """Lists recently created pastes."""
         
-        # If BeautifulSoup is not installed, this feature won't work.
         if not bs4_installed:
             show_alert_dialog(self, "List Recent Pastes", "This feature requires the BeautifulSoup 4 HTML parsing library to be installed.")
             return
@@ -587,7 +571,6 @@ class PastebinGTK(Gtk.Window):
         # If the user clicked "Get Paste", load the selected paste.
         if response == 9:
             
-            # If nothing was selected, don't continue.
             if treeiter == None:
                 return
             
@@ -607,13 +590,12 @@ class PastebinGTK(Gtk.Window):
                         "1": "Pro"
         }
         
-        # The user must be logged in to do this.
         if not self.login:
             show_error_dialog(self, "Get Account Details", "Must be logged in to view a user's details.")
             return
         
         try:
-            # Run the function to get the user's details
+            # Get the user's details
             info = pastebin_api.get_user_info(self.dev_key, self.user_key)        
         except urllib2.URLError:
             show_error_dialog(self, "Get Account Details", "Details could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
@@ -666,10 +648,7 @@ class PastebinGTK(Gtk.Window):
         filename = save_dlg.get_filename()
         save_dlg.destroy()
         
-        # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
-            
-            # Save the data.
             io.save_file(filename, self.text_buffer.get_text(self.text_buffer.get_start_iter(), self.text_buffer.get_end_iter(), False))
     
     
@@ -683,7 +662,6 @@ class PastebinGTK(Gtk.Window):
         filename = open_dlg.get_filename()
         open_dlg.destroy()
         
-        # If the user clicked OK:
         if response == Gtk.ResponseType.OK:
             
             # Read the data.
@@ -751,7 +729,6 @@ class PastebinGTK(Gtk.Window):
     def exit(self, x, y):
         """Closes the application."""
         
-        # Confirm that the user wants to quit:
         if self.config["confirm_exit"]:
             conf_exit = show_question_dialog(self, "Exit", "Are you sure you want to exit?")
             if conf_exit != Gtk.ResponseType.OK:
