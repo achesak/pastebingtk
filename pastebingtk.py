@@ -195,6 +195,7 @@ class PastebinGTK(Gtk.Window):
         grid.attach_next_to(self.login_bar, scrolled_window, Gtk.PositionType.BOTTOM, 1, 1)
         self.add(grid)
         self.show_all()
+        self.text_view.grab_focus()
         
         # Bind the events.
         self.connect("delete-event", self.delete_event)
