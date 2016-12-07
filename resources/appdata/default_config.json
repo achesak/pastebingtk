@@ -1,6 +1,5 @@
 {
       "dev_key": "",
-      "prompt_login": true,
       "remember_username": true,
       "restore_window": true,
       "confirm_exit": false,

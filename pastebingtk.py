@@ -689,7 +689,6 @@ class PastebinGTK(Gtk.Window):
         if response == Gtk.ResponseType.OK:
 
             # Set the values.
-            self.config["prompt_login"] = opt_dlg.log_chk.get_active()
             self.config["remember_username"] = opt_dlg.user_chk.get_active()
             self.config["restore_window"] = opt_dlg.win_chk.get_active()
             self.config["confirm_exit"] = opt_dlg.exit_chk.get_active()

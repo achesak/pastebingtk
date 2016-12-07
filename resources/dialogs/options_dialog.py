@@ -30,15 +30,10 @@ class OptionsDialog(Gtk.Dialog):
         gen_grid.set_row_spacing(5)
         gen_grid_lbl = Gtk.Label("General")
         
-        # Create the prompt for login checkbox.
-        self.log_chk = Gtk.CheckButton("Prompt for login")
-        self.log_chk.set_active(config["prompt_login"])
-        gen_grid.attach(self.log_chk, 0, 0, 2, 1)
-        
         # Create the remember last username checkbox.
         self.user_chk = Gtk.CheckButton("Remember last username")
         self.user_chk.set_active(config["remember_username"])
-        gen_grid.attach_next_to(self.user_chk, self.log_chk, Gtk.PositionType.BOTTOM, 2, 1)
+        gen_grid.attach(self.user_chk, 0, 0, 2, 1)
         
         # Create the restore window size checkbox.
         self.win_chk = Gtk.CheckButton("Restore window size")
