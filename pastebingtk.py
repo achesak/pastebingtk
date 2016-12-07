@@ -65,7 +65,6 @@ import resources.launch as launch
 import resources.io as io
 
 # Import the dialogs.
-from resources.dialogs.login_dialog import LoginDialog
 from resources.dialogs.create_dialog import CreatePasteDialog
 from resources.dialogs.get_dialog import GetPasteDialog
 from resources.dialogs.delete_dialog import DeletePasteDialog
