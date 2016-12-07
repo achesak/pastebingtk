@@ -106,10 +106,6 @@ class PastebinGTK(Gtk.Window):
         
         # Show the interface.
         self.create_ui()
-        
-        # Get the user login details, if they want that.
-        if self.config["prompt_login"]:
-            self.pastebin_login("ignore")
     
     
     def create_ui(self):
@@ -129,7 +125,7 @@ class PastebinGTK(Gtk.Window):
         self.text_buffer = self.text_view.get_buffer()
         scrolled_window.add(self.text_view)
         
-        # Set the font to the system default monospaced.
+        # Set the font to the system default monospace.
         self.font = Pango.FontDescription("monospace")
         self.text_view.modify_font(self.font)
         
@@ -153,8 +149,8 @@ class PastebinGTK(Gtk.Window):
         ])
         action_group.add_actions([
             ("user_menu", None, "_User"),
-            ("login", None, "_Login...", "<Control>l", None, self.pastebin_login),
-            ("logout", None, "Log_out...", "<Shift><Control>l", None, self.pastebin_logout),
+            ("login", None, "_Log in...", "<Control>l", None, self.pastebin_login),
+            ("logout", None, "Log _out...", "<Shift><Control>l", None, self.pastebin_logout),
             ("user_details", None, "Get Account _Details...", None, None, self.get_user_details)
         ])
         action_group.add_actions([
@@ -181,14 +177,34 @@ class PastebinGTK(Gtk.Window):
         toolbar = ui_manager.get_widget("/toolbar")
         grid.attach_next_to(toolbar, menubar, Gtk.PositionType.BOTTOM, 1, 1)
         grid.attach_next_to(scrolled_window, toolbar, Gtk.PositionType.BOTTOM, 1, 1)
+
+        # Create the login bar.
+        self.login_bar = Gtk.Box(spacing = 5)
+        self.login_username_entry = Gtk.Entry()
+        self.login_username_entry.set_placeholder_text("Username")
+        self.login_username_entry.set_text(self.user_name)
+        self.login_bar.pack_start(self.login_username_entry, False, False, 0)
+        self.login_password_entry = Gtk.Entry()
+        self.login_password_entry.set_placeholder_text("Password")
+        self.login_password_entry.set_visibility(False)
+        self.login_bar.pack_start(self.login_password_entry, False, False, 0)
+        self.login_btn = Gtk.Button("Log in")
+        self.login_bar.pack_start(self.login_btn, False, False, 0)
+        self.logout_btn = Gtk.Button("Log out")
+        self.login_bar.pack_start(self.logout_btn, False, False, 0)
+        spacing_lbl = Gtk.Label(" ")
+        self.login_bar.pack_end(spacing_lbl, False, False, 0)
         self.status_lbl = Gtk.Label("Not logged in")
         self.status_lbl.set_alignment(0, 0.5)
-        grid.attach_next_to(self.status_lbl, scrolled_window, Gtk.PositionType.BOTTOM, 1, 1)
+        self.login_bar.pack_end(self.status_lbl, False, False, 0)
+        grid.attach_next_to(self.login_bar, scrolled_window, Gtk.PositionType.BOTTOM, 1, 1)
         self.add(grid)
         self.show_all()
         
         # Bind the events.
         self.connect("delete-event", self.delete_event)
+        self.login_btn.connect("clicked", self.pastebin_login)
+        self.logout_btn.connect("clicked", self.pastebin_logout)
     
     
     def delete_event(self, widget, event):
@@ -411,40 +427,31 @@ class PastebinGTK(Gtk.Window):
             return
         
         # Get the username and password.
-        login_dlg = LoginDialog(self)
-        if self.config["remember_username"]:
-            login_dlg.name_ent.set_text(self.user_name)
-        response = login_dlg.run()
-        user_name = login_dlg.name_ent.get_text()
-        password = login_dlg.pass_ent.get_text()
-        login_dlg.destroy()
-        
-        if response == Gtk.ResponseType.OK:
+        user_name = self.login_username_entry.get_text()
+        password = self.login_password_entry.get_text()
+
+        # If the username and password are valid, get the user key
+        if user_name != "" and password != "":
             
-            # If the username and password are valid, get the user key
-            if user_name != "" and password != "":
-                
-                try:
-                    self.user_key = pastebin_api.create_user_key(self.config["dev_key"], user_name, password)
-                    if self.user_key == "Bad API request, invalid login":
-                        raise TypeError
-                    self.user_name = user_name
-                    self.login = True
-                    self.status_lbl.set_text("Logged in as %s." % user_name)
-                
-                except TypeError:
-                    self.user_key = ""
-                    show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
-                
-                except urllib2.URLError:
-                    show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
-                    self.login = False
+            try:
+                self.user_key = pastebin_api.create_user_key(self.config["dev_key"], user_name, password)
+                if self.user_key == "Bad API request, invalid login":
+                    raise TypeError
+                self.user_name = user_name
+                self.login = True
+                self.status_lbl.set_text("Logged in as %s." % user_name)
+                self.login_password_entry.set_text("")
             
-            else:
-                show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % "username" if user_name == "" else "password")
+            except TypeError:
+                self.user_key = ""
+                show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
+            
+            except urllib2.URLError:
+                show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
                 self.login = False
         
         else:
+            show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % "username" if user_name == "" else "password")
             self.login = False
     
     
