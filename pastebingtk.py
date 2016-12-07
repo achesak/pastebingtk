@@ -421,9 +421,12 @@ class PastebinGTK(Gtk.Window):
     def pastebin_login(self, event):
         """Logs the user in."""
         
+        current_login = False
         if self.login:
-            show_alert_dialog(self, "Login", "Already logged in as %s." % self.user_name)
-            return
+            current_login = True
+            self.login = False
+            self.user_key = ""
+            self.status_lbl.set_text("Not logged in")
         
         # Get the username and password.
         user_name = self.login_username_entry.get_text()
@@ -447,11 +450,13 @@ class PastebinGTK(Gtk.Window):
             
             except urllib2.URLError:
                 show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
-                self.login = False
+                if not current_login:
+                    self.login = False
         
         else:
             show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % "username" if user_name == "" else "password")
-            self.login = False
+            if not current_login:
+                self.login = False  
     
     
     def pastebin_logout(self, event):
