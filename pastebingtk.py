@@ -143,14 +143,9 @@ class PastebinGTK(Gtk.Window):
             ("list_trending_pastes", None, "List _Trending Pastes...", "<Control>t", None, lambda x: self.list_pastes(source = "trending")),
             ("list_users_pastes", None, "List _User's Pastes...", "<Control>u", None, lambda x: self.list_pastes(source = "user")),
             ("list_recent_pastes", None, "List _Recent Pastes...", "<Control>r", None, self.list_recent),
+            ("user_details", None, "Get Account _Details...", None, None, self.get_user_details),
             ("options", None, "_Options...", "F2", None, self.options),
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
-        ])
-        action_group.add_actions([
-            ("user_menu", None, "_User"),
-            ("login", None, "_Log in...", "<Control>l", None, self.pastebin_login),
-            ("logout", None, "Log _out...", "<Shift><Control>l", None, self.pastebin_logout),
-            ("user_details", None, "Get Account _Details...", None, None, self.get_user_details)
         ])
         action_group.add_actions([
             ("text_menu", None, "_Text"),
