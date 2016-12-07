@@ -701,7 +701,7 @@ class PastebinGTK(Gtk.Window):
             self.config["line_numbers"] = opt_dlg.lin_chk.get_active()
             self.config["dev_key"] = opt_dlg.devk_ent.get_text()
             
-            self.text_view.set_show_line_numbers(line_num)
+            self.text_view.set_show_line_numbers(self.config["line_numbers"])
         
         opt_dlg.destroy()
     
