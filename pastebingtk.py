@@ -454,7 +454,7 @@ class PastebinGTK(Gtk.Window):
                     self.login = False
         
         else:
-            show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % "username" if user_name == "" else "password")
+            show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % ("username" if user_name == "" else "password"))
             if not current_login:
                 self.login = False  
     
