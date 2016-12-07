@@ -40,7 +40,7 @@ class CreatePasteDialog(Gtk.Dialog):
         form_lbl.set_alignment(0, 0.5)
         new_grid.attach_next_to(form_lbl, name_lbl, Gtk.PositionType.BOTTOM, 1, 1)
         self.form_com = Gtk.ComboBoxText()
-        for i in EXPOSURE_LIST:
+        for i in FORMATS_LIST:
             self.form_com.append_text(i)
         self.form_com.set_active(0)
         new_grid.attach_next_to(self.form_com, form_lbl, Gtk.PositionType.RIGHT, 1, 1)
