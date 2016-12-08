@@ -78,8 +78,8 @@ from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog,
 # Import the pastebin API wrapper.
 import resources.python_pastebin.pastebin_api as pastebin_api
 import resources.python_pastebin.pastebin_extras as pastebin_extras
-from resources.python_pastebin.pastebin_dicts import FORMATS, EXPIRE, EXPOSURE
-from resources.python_pastebin.pastebin_lists import FORMATS_LIST, EXPIRE_LIST, EXPOSURE_LIST
+from resources.python_pastebin.pastebin_dicts import *
+from resources.python_pastebin.pastebin_lists import *
 
 
 class PastebinGTK(Gtk.Window):
@@ -456,7 +456,6 @@ class PastebinGTK(Gtk.Window):
     def list_pastes(self, source):
         """Get's the user's pastes or the currently trending pastes."""
         
-        exposure = {"0": "Public", "1": "Unlisted", "2": "Private"}
         title1 = "List User's Pastes" if source == "user" else "List Trending Pastes"
         title2 = "%s's Pastes" % self.user_name if source == "user" else "Trending Pastes"
         
@@ -496,7 +495,7 @@ class PastebinGTK(Gtk.Window):
                 new.append("Never")
             else:
                 new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["expire_date"]))))
-            new.append(exposure[i["private"]])
+            new.append(EXPOSURE_REVERSED[i["private"]])
             size = int(i["size"])
             if size < 1000:
                 new.append("%d bytes" % size)
@@ -553,9 +552,7 @@ class PastebinGTK(Gtk.Window):
         # Reformat the data into something the dialog can use.
         data = []
         for i in pastes:
-            row = [
-                i["name"], i["key"], i["format"] if i["format"] != "-" else "Unknown", i["time_created"], i["link"]
-            ]
+            row = [i["name"], i["key"], i["format"] if i["format"] != "-" else "Unknown", i["time_created"], i["link"]]
             data.append(row)
         
         # Show the list of pastes.
@@ -577,14 +574,6 @@ class PastebinGTK(Gtk.Window):
     
     def get_user_details(self, event):
         """Gets the user's information and settings."""
-        
-        ACCOUNT_PRIVACY = {"0": "Public",
-                           "1": "Unlisted",
-                           "2": "Private"
-        }
-        ACCOUNT_TYPE = {"0": "Normal",
-                        "1": "Pro"
-        }
         
         if not self.login:
             show_error_dialog(self, "Get Account Details", "Must be logged in to view a user's details.")
@@ -617,7 +606,7 @@ class PastebinGTK(Gtk.Window):
         if "expiration" in info:
             data.append(["Default Expiration", info["expiration"]])
         if "private" in info:
-            data.append(["Default Exposure", ACCOUNT_PRIVACY[info["private"]]])
+            data.append(["Default Exposure", EXPOSURE_REVERSED[info["private"]]])
         
         # If Beautiful Soup is installed, get some extra info.
         if bs4_installed:

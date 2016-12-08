@@ -242,3 +242,15 @@ EXPIRE = {"Never": "N",
 EXPOSURE = {"Public": 0,
             "Unlisted": 1,
             "Private": 2}
+
+
+# Exposure (reversed): key is used by API, value is human readable
+EXPOSURE_REVERSED = {"0": "Public",
+                  "1": "Unlisted",
+                  "2": "Private"
+}
+
+# Account type: key is used by API, value is human readable
+ACCOUNT_TYPE = {"0": "Normal",
+                "1": "Pro"
+}
