@@ -705,8 +705,8 @@ class PastebinGTK(Gtk.Window):
         about_dlg.set_copyright("Copyright (c) 2013-2016 Adam Chesak")
         about_dlg.set_authors(["Adam Chesak <achesak@yahoo.com>"])
         about_dlg.set_license(license_text)
-        about_dlg.set_website("http://poultryandprogramming.wordpress.com/")
-        about_dlg.set_website_label("http://poultryandprogramming.wordpress.com/")
+        about_dlg.set_website("https://github.com/achesak/pastebingtk")
+        about_dlg.set_website_label("https://github.com/achesak/pastebingtk")
         about_dlg.show_all()
     
     
