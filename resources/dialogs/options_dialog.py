@@ -36,6 +36,7 @@ class OptionsDialog(Gtk.Dialog):
         # Create the remember last username checkbox.
         self.user_chk = Gtk.CheckButton("Remember last username")
         self.user_chk.set_active(config["remember_username"])
+        self.user_chk.set_tooltip_text("Remember and restore the last username after application is restarted")
         self.user_chk.set_margin_top(5)
         self.user_chk.set_margin_left(5)
         self.user_chk.set_margin_right(5)
@@ -44,6 +45,7 @@ class OptionsDialog(Gtk.Dialog):
         # Create the restore window size checkbox.
         self.win_chk = Gtk.CheckButton("Restore window size")
         self.win_chk.set_active(config["restore_window"])
+        self.win_chk.set_tooltip_text("Remember and restore window size after application is restarted")
         self.win_chk.set_margin_left(5)
         self.win_chk.set_margin_right(5)
         gen_grid.attach_next_to(self.win_chk, self.user_chk, Gtk.PositionType.BOTTOM, 2, 1)
@@ -51,6 +53,7 @@ class OptionsDialog(Gtk.Dialog):
         # Create the confirm on exit checkbox.
         self.exit_chk = Gtk.CheckButton("Confirm on exit")
         self.exit_chk.set_active(config["confirm_exit"])
+        self.exit_chk.set_tooltip_text("Prompt for confirmation on application close")
         self.exit_chk.set_margin_left(5)
         self.exit_chk.set_margin_right(5)
         gen_grid.attach_next_to(self.exit_chk, self.win_chk, Gtk.PositionType.BOTTOM, 2, 1)
@@ -58,12 +61,14 @@ class OptionsDialog(Gtk.Dialog):
         # Create the check for spam filter checkbox.
         self.spam_chk = Gtk.CheckButton("Check for spam filter")
         self.spam_chk.set_active(config["check_spam"])
+        self.spam_chk.set_tooltip_text("Check if pastes get caught in the spam filter and provide an option to continue if they do")
         self.spam_chk.set_margin_left(5)
         self.spam_chk.set_margin_right(5)
         gen_grid.attach_next_to(self.spam_chk, self.exit_chk, Gtk.PositionType.BOTTOM, 2, 1)
         
         # Create the pastes to retrieve label and spinbutton.
         lnum_lbl = Gtk.Label("Pastes to retrieve: ")
+        lnum_lbl.set_tooltip_text("Number of trending, recent, and user-authored pastes to retrieve at once")
         lnum_lbl.set_alignment(0, 0.5)
         lnum_lbl.set_margin_left(5)
         lnum_lbl.set_margin_bottom(5)
@@ -84,6 +89,7 @@ class OptionsDialog(Gtk.Dialog):
         
         # Create the default name label and entry.
         name_lbl = Gtk.Label("Default name: ")
+        name_lbl.set_tooltip_text("Default name to use when creating a paste")
         name_lbl.set_alignment(0, 0.5)
         name_lbl.set_margin_top(5)
         name_lbl.set_margin_left(5)
@@ -96,6 +102,7 @@ class OptionsDialog(Gtk.Dialog):
         
         # Create the default format label and combobox.
         form_lbl = Gtk.Label("Default format: ")
+        form_lbl.set_tooltip_text("Default format to use when creating a paste")
         form_lbl.set_alignment(0, 0.5)
         form_lbl.set_margin_left(5)
         def_grid.attach_next_to(form_lbl, name_lbl, Gtk.PositionType.BOTTOM, 1, 1)
@@ -108,6 +115,7 @@ class OptionsDialog(Gtk.Dialog):
         
         # Create the default expiration label and combobox.
         expi_lbl = Gtk.Label("Default expiration: ")
+        expi_lbl.set_tooltip_text("Default expiration to use when creating a paste")
         expi_lbl.set_alignment(0, 0.5)
         expi_lbl.set_margin_left(5)
         def_grid.attach_next_to(expi_lbl, form_lbl, Gtk.PositionType.BOTTOM, 1, 1)
@@ -120,6 +128,7 @@ class OptionsDialog(Gtk.Dialog):
         
         # Create the default exposure label and combobox.
         expo_lbl = Gtk.Label("Default exposure: ")
+        expo_lbl.set_tooltip_text("Default exposure to use when creating a paste")
         expo_lbl.set_alignment(0, 0.5)
         expo_lbl.set_margin_left(5)
         expo_lbl.set_margin_bottom(5)
@@ -141,6 +150,7 @@ class OptionsDialog(Gtk.Dialog):
         # Create the show line numbers checkbox.
         self.lin_chk = Gtk.CheckButton("Show line numbers")
         self.lin_chk.set_active(config["line_numbers"])
+        self.lin_chk.set_tooltip_text("Show or hide line numbers in main editor")
         self.lin_chk.set_margin_top(5)
         self.lin_chk.set_margin_bottom(5)
         self.lin_chk.set_margin_left(5)
@@ -155,6 +165,7 @@ class OptionsDialog(Gtk.Dialog):
         
         # Create the developer key label and entry.
         devk_lbl = Gtk.Label("Developer key: ")
+        devk_lbl.set_tooltip_text("Pastebin developer key, required to use Pastebin API")
         devk_lbl.set_alignment(0, 0.5)
         devk_lbl.set_margin_top(5)
         devk_lbl.set_margin_left(5)
