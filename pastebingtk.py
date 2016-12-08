@@ -451,7 +451,6 @@ class PastebinGTK(Gtk.Window):
         self.login = False
         self.user_key = ""
         self.status_lbl.set_text("Not logged in")
-        show_alert_dialog(self, "Logout", "You are now logged out.")
     
     
     def list_pastes(self, source):
