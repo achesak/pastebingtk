@@ -8,28 +8,7 @@
 
 # PastebinGTK is a desktop client for pastebin.com.
 
-# Released under the MIT open source license:
-license_text = """
-Copyright (c) 2013-2016 Adam Chesak
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-"""
+# Released under the GNU General Public License version 3.
 
 ################################################################################
 
@@ -717,7 +696,7 @@ class PastebinGTK(Gtk.Window):
         about_dlg.set_logo(pixbuf)
         about_dlg.set_version(self.ui_data["version"])
         about_dlg.set_comments("PastebinGTK is a desktop client for pastebin.com.")
-        about_dlg.set_copyright("Copyright (c) 2013-2016 Adam Chesak")
+        about_dlg.set_copyright("Copyright (c) 2013-2017 Adam Chesak")
         about_dlg.set_authors(["Adam Chesak <achesak@yahoo.com>"])
         about_dlg.set_license(license_text)
         about_dlg.set_website("https://github.com/achesak/pastebingtk")

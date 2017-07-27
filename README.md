@@ -20,7 +20,7 @@ platform.
 
 # License
 
-PastebinGTK is released under the [MIT open source license](http://opensource.org/licenses/mit-license.php). See the `LICENSE` file for more information.
+PastebinGTK is released under the GNU General Public License version 3. See the `LICENSE` file for more information.
 
 PastebinGTK uses the [python-pastebin](https://github.com/achesak/python-pastebin) API wrapper to get data from pastebin.com
 
