@@ -25,9 +25,11 @@ class UserDetailsDialog(Gtk.Dialog):
         self.treeview = Gtk.TreeView(model = self.liststore)
         field_text = Gtk.CellRendererText()
         field_col = Gtk.TreeViewColumn("Field", field_text, text = 0)
+        field_col.set_min_width(200)
         self.treeview.append_column(field_col)
         value_text = Gtk.CellRendererText()
         value_col = Gtk.TreeViewColumn("Value", value_text, text = 1)
+        value_col.set_expand(True)
         self.treeview.append_column(value_col)
         
         # Build the interface.
