@@ -82,25 +82,28 @@ def list_recent_pastes():
 
 def get_paste_info(url):
     """Gets info on a paste (by URL)."""
-    
+
     response = urlopen(url)
     html = response.read()
     response.close()
-    
+
     parser = BeautifulSoup(html, "lxml")
     data = {}
-    
+
     # Structure: Body > Div:paste_box_info > Div:paste_box_line1/2
     content = parser.find("body").find("div", {"class": "paste_box_info"})
     box_line1 = content.find("div", {"class": "paste_box_line1"})
     box_line2 = content.find("div", {"class": "paste_box_line2"})
-    
+
     data["name"] = box_line1.find("h1").string.strip()
-    data["username"] = box_line2.find("a").string.strip()
+    try:
+        data["username"] = box_line2.find("a").string.strip()
+    except AttributeError:
+        data["username"] = "Guest user"
     data["uploaded"] = box_line2.find("span").string.strip()
     data["views"] = box_line2.find("img", {"class": "t_vi"}).next_sibling.strip()
     data["delete"] = box_line2.find("img", {"class": "t_ex"}).next_sibling.strip()
-    
+
     return data
 
 
@@ -111,7 +114,7 @@ def get_user_details_extra(username):
     html = response.read()
     response.close()
     
-    parser = BeautifulSoup(html, "lxml")
+    parser = BeautifulSoup(html)
     
     # Structure: Body > Div:paste_box_frame > Div:paste_box_line_u2
     content = parser.find("body").find("div", {"class": "paste_box_frame"}).find("div", {"class": "paste_box_line_u2"})

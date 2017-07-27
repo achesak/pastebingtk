@@ -395,7 +395,7 @@ class PastebinGTK(Gtk.Window):
         
         # Get the paste info.
         try:
-            info = pastebin_extras.get_paste_info("http://pastebin.com/" + key)
+            info = pastebin_extras.get_paste_info("https://pastebin.com/" + key)
         except urllib2.URLError:
             show_error_dialog(self, "Get Paste Info", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
