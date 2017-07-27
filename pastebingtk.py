@@ -316,7 +316,7 @@ class PastebinGTK(Gtk.Window):
         data = []
         for i in pastes:
             new = []
-            new.append(i["title"])
+            new.append(i["title"] if i["title"] else "Untitled")
             new.append(i["key"])
             new.append(i["format_long"])
             new.append(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(int(i["expire_date"]))))
