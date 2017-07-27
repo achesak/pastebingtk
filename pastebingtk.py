@@ -287,7 +287,7 @@ class PastebinGTK(Gtk.Window):
             get_dlg = GetPasteDialog(self)
             response = get_dlg.run()
             key = get_dlg.key_ent.get_text()
-            if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
+            if key.startswith("http") or key.startswith("www.") or key.startswith("pastebin"):
                 key = key.rsplit("/", 1)[-1]
             get_dlg.destroy()
 
@@ -386,7 +386,7 @@ class PastebinGTK(Gtk.Window):
         get_dlg = GetPasteDialog(self, title = "Get Paste Info")
         response = get_dlg.run()
         key = get_dlg.key_ent.get_text()
-        if key.startswith("http://") or key.startswith("www.") or key.startswith("pastebin"):
+        if key.startswith("http") or key.startswith("www.") or key.startswith("pastebin"):
             key = key.rsplit("/", 1)[-1]
         get_dlg.destroy()
     
