@@ -57,6 +57,14 @@ class OptionsDialog(Gtk.Dialog):
         self.exit_chk.set_margin_left(5)
         self.exit_chk.set_margin_right(5)
         gen_grid.attach_next_to(self.exit_chk, self.win_chk, Gtk.PositionType.BOTTOM, 2, 1)
+
+        # Create the show line numbers checkbox.
+        self.lin_chk = Gtk.CheckButton("Show line numbers")
+        self.lin_chk.set_active(config["line_numbers"])
+        self.lin_chk.set_tooltip_text("Show or hide line numbers in main editor")
+        self.lin_chk.set_margin_left(5)
+        self.lin_chk.set_margin_right(5)
+        gen_grid.attach_next_to(self.lin_chk, self.exit_chk, Gtk.PositionType.BOTTOM, 2, 1)
         
         # Create the check for spam filter checkbox.
         self.spam_chk = Gtk.CheckButton("Check for spam filter")
@@ -64,7 +72,7 @@ class OptionsDialog(Gtk.Dialog):
         self.spam_chk.set_tooltip_text("Check if pastes get caught in the spam filter and provide an option to continue if they do")
         self.spam_chk.set_margin_left(5)
         self.spam_chk.set_margin_right(5)
-        gen_grid.attach_next_to(self.spam_chk, self.exit_chk, Gtk.PositionType.BOTTOM, 2, 1)
+        gen_grid.attach_next_to(self.spam_chk, self.lin_chk, Gtk.PositionType.BOTTOM, 2, 1)
         
         # Create the pastes to retrieve label and spinbutton.
         lnum_lbl = Gtk.Label("Pastes to retrieve: ")
@@ -141,22 +149,6 @@ class OptionsDialog(Gtk.Dialog):
         self.expo_com.set_margin_bottom(5)
         def_grid.attach_next_to(self.expo_com, expo_lbl, Gtk.PositionType.RIGHT, 1, 1)
         
-        # Create the Editing tab.
-        edit_grid = Gtk.Grid()
-        edit_grid.set_column_spacing(10)
-        edit_grid.set_row_spacing(5)
-        edit_grid_lbl = Gtk.Label("Editing")
-        
-        # Create the show line numbers checkbox.
-        self.lin_chk = Gtk.CheckButton("Show line numbers")
-        self.lin_chk.set_active(config["line_numbers"])
-        self.lin_chk.set_tooltip_text("Show or hide line numbers in main editor")
-        self.lin_chk.set_margin_top(5)
-        self.lin_chk.set_margin_bottom(5)
-        self.lin_chk.set_margin_left(5)
-        self.lin_chk.set_margin_right(5)
-        edit_grid.attach(self.lin_chk, 0, 0, 2, 1)
-        
         # Create the Technical tab.
         tech_grid = Gtk.Grid()
         tech_grid.set_column_spacing(10)
@@ -187,7 +179,6 @@ class OptionsDialog(Gtk.Dialog):
         opt_box.add(notebook)
         notebook.append_page(gen_grid, gen_grid_lbl)
         notebook.append_page(def_grid, def_grid_lbl)
-        notebook.append_page(edit_grid, edit_grid_lbl)
         notebook.append_page(tech_grid, tech_grid_lbl)
         
         # Show the dialog.
