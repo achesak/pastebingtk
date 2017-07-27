@@ -114,7 +114,7 @@ def get_user_details_extra(username):
     html = response.read()
     response.close()
     
-    parser = BeautifulSoup(html)
+    parser = BeautifulSoup(html, "lxml")
     
     # Structure: Body > Div:paste_box_frame > Div:paste_box_line_u2
     content = parser.find("body").find("div", {"class": "paste_box_frame"}).find("div", {"class": "paste_box_line_u2"})
