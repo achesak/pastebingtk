@@ -408,7 +408,7 @@ class PastebinGTK(Gtk.Window):
         
         # Show the paste info.
         paste_dlg = UserDetailsDialog(self, "Paste Info for " + key, data)
-        response = paste_dlg.run()
+        paste_dlg.run()
         paste_dlg.destroy()
         
     
@@ -610,8 +610,8 @@ class PastebinGTK(Gtk.Window):
         
         # If Beautiful Soup is installed, get some extra info.
         if bs4_installed:
-			extra_info = pastebin_extras.get_user_details_extra(self.user_name)
-			data += extra_info
+            extra_info = pastebin_extras.get_user_details_extra(self.user_name)
+            data += extra_info
         
         # Show the user's details.
         user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data)
@@ -724,7 +724,7 @@ class PastebinGTK(Gtk.Window):
         Gtk.main_quit()
 
 
-if  __name__ == "__main__" and len(sys.argv) == 1:
+if __name__ == "__main__" and len(sys.argv) == 1:
     
     win = PastebinGTK()
     win.connect("delete-event", win.exit)
