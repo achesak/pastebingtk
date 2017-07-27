@@ -58,7 +58,7 @@ def list_recent_pastes():
     html = response.read()
     response.close()
     
-    parser = BeautifulSoup(html)
+    parser = BeautifulSoup(html, "lxml")
     data = []
         
     # Structure: Body > Table > TR > data stored in TD
@@ -87,7 +87,7 @@ def get_paste_info(url):
     html = response.read()
     response.close()
     
-    parser = BeautifulSoup(html)
+    parser = BeautifulSoup(html, "lxml")
     data = {}
     
     # Structure: Body > Div:paste_box_info > Div:paste_box_line1/2
@@ -111,7 +111,7 @@ def get_user_details_extra(username):
     html = response.read()
     response.close()
     
-    parser = BeautifulSoup(html)
+    parser = BeautifulSoup(html, "lxml")
     
     # Structure: Body > Div:paste_box_frame > Div:paste_box_line_u2
     content = parser.find("body").find("div", {"class": "paste_box_frame"}).find("div", {"class": "paste_box_line_u2"})
