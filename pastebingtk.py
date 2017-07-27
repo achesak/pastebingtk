@@ -185,8 +185,6 @@ class PastebinGTK(Gtk.Window):
         self.login_bar.pack_start(self.login_password_entry, False, False, 0)
         self.login_btn = Gtk.Button("Log in")
         self.login_bar.pack_start(self.login_btn, False, False, 0)
-        self.logout_btn = Gtk.Button("Log out")
-        self.login_bar.pack_start(self.logout_btn, False, False, 0)
         spacing_lbl = Gtk.Label(" ")
         self.login_bar.pack_end(spacing_lbl, False, False, 0)
         self.status_lbl = Gtk.Label("Not logged in")
@@ -200,7 +198,6 @@ class PastebinGTK(Gtk.Window):
         # Bind the events.
         self.connect("delete-event", self.delete_event)
         self.login_btn.connect("clicked", self.pastebin_login)
-        self.logout_btn.connect("clicked", self.pastebin_logout)
     
     
     def delete_event(self, widget, event):
@@ -417,40 +414,43 @@ class PastebinGTK(Gtk.Window):
     
     def pastebin_login(self, event):
         """Logs the user in."""
-        
-        # Get the username and password.
-        user_name = self.login_username_entry.get_text()
-        password = self.login_password_entry.get_text()
 
-        # If the username and password are valid, get the user key
-        if user_name != "" and password != "":
-            
-            try:
-                self.user_key = pastebin_api.create_user_key(self.config["dev_key"], user_name, password)
-                if self.user_key == "Bad API request, invalid login":
-                    raise TypeError
-                self.user_name = user_name
-                self.login = True
-                self.status_lbl.set_text("Logged in as %s." % user_name)
-                self.login_password_entry.set_text("")
-            
-            except TypeError:
-                self.user_key = ""
-                show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
-            
-            except urllib2.URLError:
-                show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
-        
+        # Logout:
+        if self.login:
+            self.login = False
+            self.user_key = ""
+            self.status_lbl.set_text("Not logged in")
+            self.login_btn.set_label("Log in")
+
+        # Login:
         else:
-            show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % ("username" if user_name == "" else "password"))
-    
-    
-    def pastebin_logout(self, event):
-        """Logs the user out."""
         
-        self.login = False
-        self.user_key = ""
-        self.status_lbl.set_text("Not logged in")
+            # Get the username and password.
+            user_name = self.login_username_entry.get_text()
+            password = self.login_password_entry.get_text()
+
+            # If the username and password are valid, get the user key
+            if user_name != "" and password != "":
+
+                try:
+                    self.user_key = pastebin_api.create_user_key(self.config["dev_key"], user_name, password)
+                    if self.user_key == "Bad API request, invalid login":
+                        raise TypeError
+                    self.user_name = user_name
+                    self.login = True
+                    self.status_lbl.set_text("Logged in as %s." % user_name)
+                    self.login_password_entry.set_text("")
+                    self.login_btn.set_label("Log out")
+
+                except TypeError:
+                    self.user_key = ""
+                    show_error_dialog(self, "Login", "Invalid username or password specified.\n\nNot logged in.")
+
+                except urllib2.URLError:
+                    show_error_dialog(self, "Login", "User authentication could not be sent.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
+
+            else:
+                show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % ("username" if user_name == "" else "password"))
     
     
     def list_pastes(self, source):
