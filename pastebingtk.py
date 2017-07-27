@@ -689,8 +689,12 @@ class PastebinGTK(Gtk.Window):
         loader.write(img_bin)
         loader.close()
         pixbuf = loader.get_pixbuf()
+
+        license_file = open("LICENSE.md", "r")
+        license_text = license_file.read()
+        license_file.close()
         
-        about_dlg = Gtk.AboutDialog()
+        about_dlg = Gtk.AboutDialog(self)
         about_dlg.set_title("About " + self.ui_data["title"])
         about_dlg.set_program_name(self.ui_data["title"])
         about_dlg.set_logo(pixbuf)
