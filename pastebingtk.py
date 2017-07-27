@@ -102,7 +102,7 @@ class PastebinGTK(Gtk.Window):
         self.user_name = self.application_data["username"]
         self.user_key = ""
         self.dev_key = self.config["dev_key"]
-        self.login = False
+        self.logged_in = False
         
         # Show the interface.
         self.create_ui()
@@ -197,7 +197,9 @@ class PastebinGTK(Gtk.Window):
         
         # Bind the events.
         self.connect("delete-event", self.delete_event)
-        self.login_btn.connect("clicked", self.pastebin_login)
+        self.login_btn.connect("clicked", self.login)
+        self.login_username_entry.connect("activate", self.login_username)
+        self.login_password_entry.connect("activate", self.login_password)
     
     
     def delete_event(self, widget, event):
@@ -315,7 +317,7 @@ class PastebinGTK(Gtk.Window):
     def delete_paste(self, event):
         """Deletes an existing paste."""
         
-        if not self.login:
+        if not self.logged_in:
             show_error_dialog(self, "Delete Paste", "Must be logged in to delete a paste.")
             return
         
@@ -412,12 +414,12 @@ class PastebinGTK(Gtk.Window):
         paste_dlg.destroy()
         
     
-    def pastebin_login(self, event):
+    def login(self, event):
         """Logs the user in."""
 
         # Logout:
-        if self.login:
-            self.login = False
+        if self.logged_in:
+            self.logged_in = False
             self.user_key = ""
             self.status_lbl.set_text("Not logged in")
             self.login_btn.set_label("Log in")
@@ -437,7 +439,7 @@ class PastebinGTK(Gtk.Window):
                     if self.user_key == "Bad API request, invalid login":
                         raise TypeError
                     self.user_name = user_name
-                    self.login = True
+                    self.logged_in = True
                     self.status_lbl.set_text("Logged in as %s." % user_name)
                     self.login_password_entry.set_text("")
                     self.login_btn.set_label("Log out")
@@ -451,6 +453,19 @@ class PastebinGTK(Gtk.Window):
 
             else:
                 show_error_dialog(self, "Login", "No %s entered.\n\nNot logged in." % ("username" if user_name == "" else "password"))
+
+
+    def login_username(self, event):
+        """Continue login from username."""
+
+        self.login_password_entry.grab_focus()
+
+
+    def login_password(self, event):
+        """Continue login from password."""
+
+        if not self.logged_in:
+            self.login(None)
     
     
     def list_pastes(self, source):
@@ -460,7 +475,7 @@ class PastebinGTK(Gtk.Window):
         title2 = "%s's Pastes" % self.user_name if source == "user" else "Trending Pastes"
         
         # If getting the user's pastes, the user must be logged in.
-        if source == "user" and not self.login:
+        if source == "user" and not self.logged_in:
             show_error_dialog(self, title1, "Must be logged in to view a user's pastes.")
             return
         
@@ -575,7 +590,7 @@ class PastebinGTK(Gtk.Window):
     def get_user_details(self, event):
         """Gets the user's information and settings."""
         
-        if not self.login:
+        if not self.logged_in:
             show_error_dialog(self, "Get Account Details", "Must be logged in to view a user's details.")
             return
         
