@@ -42,6 +42,7 @@ sys.dont_write_bytecode = True
 # Import the application modules
 import resources.launch as launch
 import resources.io as io
+from resources.constants import *
 
 # Import the dialogs.
 from resources.dialogs.create_dialog import CreatePasteDialog
@@ -51,6 +52,7 @@ from resources.dialogs.list_user_dialog import ListUserPastesDialog
 from resources.dialogs.list_trending_dialog import ListTrendingPastesDialog
 from resources.dialogs.list_recent_dialog import ListRecentDialog
 from resources.dialogs.user_details_dialog import UserDetailsDialog
+from resources.dialogs.paste_details_dialog import PasteDetailsDialog
 from resources.dialogs.options_dialog import OptionsDialog
 from resources.dialogs.misc_dialogs import show_alert_dialog, show_error_dialog, show_question_dialog
 
@@ -381,6 +383,7 @@ class PastebinGTK(Gtk.Window):
         
         data = [
             ["Name", info["name"]],
+            ["URL", "https://pastebin.com/" + key],
             ["Uploaded by", info["username"]],
             ["Views", info["views"]],
             ["Upload time", info["uploaded"]],
@@ -388,9 +391,13 @@ class PastebinGTK(Gtk.Window):
         ]
         
         # Show the paste info.
-        paste_dlg = UserDetailsDialog(self, "Paste Info for " + key, data)
-        paste_dlg.run()
+        paste_dlg = PasteDetailsDialog(self, "Paste Info for " + key, data)
+        response = paste_dlg.run()
         paste_dlg.destroy()
+
+        # If the user pressed "View Paste", open the paste in a web browser.
+        if response == DialogResponse.VIEW_PASTE:
+            webbrowser.open(data[1][1])
         
     
     def login(self, event):
