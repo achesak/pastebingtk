@@ -7,7 +7,7 @@
 # Import GTK for the dialog.
 from gi.repository import Gtk
 
-# Import application modules
+# Import application modules.
 from resources.constants import *
 
 
@@ -19,7 +19,7 @@ class UserDetailsDialog(Gtk.Dialog):
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(400, 300)
-        self.add_button("View Profile", 9)
+        self.add_button("View Profile", DialogResponse.VIEW_PROFILE)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
         # Create the columns.

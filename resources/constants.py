@@ -13,7 +13,6 @@ __all__ = ["DialogResponse"]
 
 
 class DialogResponse:
-    GET_PASTE = 0
+    GET_PASTE = 5
     VIEW_PROFILE = 9
     VIEW_PASTE = 10
-    

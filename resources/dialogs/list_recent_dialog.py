@@ -7,6 +7,9 @@
 # Import GTK for the dialog.
 from gi.repository import Gtk
 
+# Import application modules.
+from resources.constants import *
+
 
 class ListRecentDialog(Gtk.Dialog):
     """Shows the list dialog."""
@@ -16,7 +19,7 @@ class ListRecentDialog(Gtk.Dialog):
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(1200, 500)
-        self.get_btn = self.add_button("Get Paste", 9)
+        self.get_btn = self.add_button("Get Paste", DialogResponse.GET_PASTE)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
         
         # Create the columns for displaying the pastes.

@@ -39,7 +39,7 @@ except ImportError:
 # This line can be removed be the user, if desired.
 sys.dont_write_bytecode = True
 
-# Import the application modules
+# Import application modules.
 import resources.launch as launch
 import resources.io as io
 from resources.constants import *
@@ -519,7 +519,7 @@ class PastebinGTK(Gtk.Window):
         list_dlg.destroy()
         
         # If the user clicked "Get Paste", load the selected paste.
-        if response == 9:
+        if response == DialogResponse.GET_PASTE:
             
             if treeiter == None:
                 return
@@ -563,7 +563,7 @@ class PastebinGTK(Gtk.Window):
         list_dlg.destroy()
         
         # If the user clicked "Get Paste", load the selected paste.
-        if response == 9:
+        if response == DialogResponse.GET_PASTE:
             
             if treeiter == None:
                 return
