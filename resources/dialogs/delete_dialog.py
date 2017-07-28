@@ -18,7 +18,7 @@ class DeletePasteDialog(Gtk.Dialog):
         Gtk.Dialog.__init__(self, "Delete Paste", parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(1000, 500)
         self.add_button("Cancel", Gtk.ResponseType.CANCEL)
-        self.add_button("OK", Gtk.ResponseType.OK)
+        self.add_button("Delete", Gtk.ResponseType.OK)
 
         # Create the columns for displaying the paste info.
         self.liststore = Gtk.ListStore(str, str, str, str)
