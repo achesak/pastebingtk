@@ -581,9 +581,9 @@ class PastebinGTK(Gtk.Window):
         if "email" in info:
             data.append(["Email", info["email"]])
         if "website" in info:
-            data.append(["Website", info["website"]])
+            data.append(["Website", info["website"] if info["website"] else "None provided"])
         if "location" in info:
-            data.append(["Location", info["location"]])
+            data.append(["Location", info["location"] if info["location"] else "None provided"])
         if "account_type" in info:
             data.append(["Account Type", ACCOUNT_TYPE[info["account_type"]]])
 
