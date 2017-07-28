@@ -577,9 +577,7 @@ class PastebinGTK(Gtk.Window):
             return
 
         # Format the data into the way the dialog uses it.
-        data = [
-            ["User URL", "http://pastebin.com/u/" + info["name"]]
-        ]
+        data = []
         if "email" in info:
             data.append(["Email", info["email"]])
         if "website" in info:
@@ -607,7 +605,7 @@ class PastebinGTK(Gtk.Window):
 
         # If the user pressed "View Profile", open the profile in a web browser.
         if response == 9:
-            webbrowser.open(data[1][1])
+            webbrowser.open("https://pastebin.com/u/" + info["name"])
 
     def save_file(self, event):
         """Saves the text to a file."""

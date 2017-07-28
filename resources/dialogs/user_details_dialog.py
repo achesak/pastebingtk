@@ -29,11 +29,14 @@ class UserDetailsDialog(Gtk.Dialog):
         self.add_button("Close", Gtk.ResponseType.CLOSE)
 
         # Create the columns.
-        response = urllib2.urlopen(avatar_url)
-        input_stream = Gio.MemoryInputStream.new_from_data(response.read(), None)
-        pixbuf = Pixbuf.new_from_stream(input_stream, None)
         avatar_img = Gtk.Image()
-        avatar_img.set_from_pixbuf(pixbuf)
+        try:
+            response = urllib2.urlopen(avatar_url)
+            input_stream = Gio.MemoryInputStream.new_from_data(response.read(), None)
+            pixbuf = Pixbuf.new_from_stream(input_stream, None)
+            avatar_img.set_from_pixbuf(pixbuf)
+        except urllib2.URLError:
+            pass
         avatar_img.props.halign = Gtk.Align.CENTER
         avatar_img.set_hexpand(True)
         self.get_content_area().add(avatar_img)
