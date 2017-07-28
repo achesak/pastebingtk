@@ -6,6 +6,11 @@
 
 # Import GTK for the dialog.
 from gi.repository import Gtk
+from gi.repository.GdkPixbuf import Pixbuf
+from gi.repository import Gio
+
+# Import python modules.
+import urllib2
 
 # Import application modules.
 from resources.constants import *
@@ -14,16 +19,24 @@ from resources.constants import *
 class UserDetailsDialog(Gtk.Dialog):
     """Shows the user details dialog."""
 
-    def __init__(self, parent, title, data):
+    def __init__(self, parent, title, data, avatar_url):
         """Create the dialog."""
 
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
-        self.set_default_size(600, 300)
+        self.set_default_size(500, 400)
         self.add_button("View Profile", DialogResponse.VIEW_PROFILE)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
 
         # Create the columns.
+        response = urllib2.urlopen(avatar_url)
+        input_stream = Gio.MemoryInputStream.new_from_data(response.read(), None)
+        pixbuf = Pixbuf.new_from_stream(input_stream, None)
+        avatar_img = Gtk.Image()
+        avatar_img.set_from_pixbuf(pixbuf)
+        avatar_img.props.halign = Gtk.Align.CENTER
+        avatar_img.set_hexpand(True)
+        self.get_content_area().add(avatar_img)
         self.liststore = Gtk.ListStore(str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
         field_text = Gtk.CellRendererText()
@@ -40,7 +53,7 @@ class UserDetailsDialog(Gtk.Dialog):
         scrolled_win.set_hexpand(True)
         scrolled_win.set_vexpand(True)
         scrolled_win.add(self.treeview)
-        self.get_content_area().add(scrolled_win)
+        self.get_content_area().pack_end(scrolled_win, True, True, 0)
 
         # Add the data.
         for i in data:

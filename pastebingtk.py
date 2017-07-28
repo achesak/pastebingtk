@@ -13,7 +13,7 @@
 ################################################################################
 
 
-# Import GTK and Python lib modules.
+# Import GTK and Python modules.
 import gi
 gi.require_version("Gtk", "3.0")
 gi.require_version("GtkSource", "3.0")
@@ -578,7 +578,6 @@ class PastebinGTK(Gtk.Window):
 
         # Format the data into the way the dialog uses it.
         data = [
-            ["Username", info["name"]],
             ["User URL", "http://pastebin.com/u/" + info["name"]]
         ]
         if "email" in info:
@@ -587,8 +586,6 @@ class PastebinGTK(Gtk.Window):
             data.append(["Website", info["website"]])
         if "location" in info:
             data.append(["Location", info["location"]])
-        if "avatar_url" in info:
-            data.append(["Avatar URL", info["avatar_url"]])
         if "account_type" in info:
             data.append(["Account Type", ACCOUNT_TYPE[info["account_type"]]])
         if "format_short" in info:
@@ -604,7 +601,7 @@ class PastebinGTK(Gtk.Window):
             data += extra_info
 
         # Show the user's details.
-        user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data)
+        user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data, info["avatar_url"])
         response = user_dlg.run()
         user_dlg.destroy()
 
