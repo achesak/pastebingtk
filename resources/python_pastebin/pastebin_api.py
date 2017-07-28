@@ -166,17 +166,17 @@ def get_user_info(devkey, userkey):
         "avatar_url": root.find("user_avatar_url").text,
         "account_type": root.find("user_account_type").text
     }
-    if root.find("user_format_short"):
+    if root.find("user_format_short") is not None:
         info["format_short"] = root.find("user_format_short").text
-    if root.find("user_expiration"):
+    if root.find("user_expiration") is not None:
         info["expiration"] = root.find("user_expiration").text
-    if root.find("user_private"):
-        info["private"] = root.find("private").text
-    if root.find("user_website"):
+    if root.find("user_private") is not None:
+        info["private"] = root.find("user_private").text
+    if root.find("user_website") is not None:
         info["website"] = root.find("user_website").text
-    if root.find("user_email"):
+    if root.find("user_email") is not None:
         info["email"] = root.find("user_email").text
-    if root.find("user_location"):
+    if root.find("user_location") is not None:
         info["location"] = root.find("user_location").text
 
     return info
