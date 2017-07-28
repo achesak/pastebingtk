@@ -586,17 +586,23 @@ class PastebinGTK(Gtk.Window):
             data.append(["Location", info["location"]])
         if "account_type" in info:
             data.append(["Account Type", ACCOUNT_TYPE[info["account_type"]]])
-        if "format_short" in info:
-            data.append(["Default Format", info["format_short"]])
-        if "expiration" in info:
-            data.append(["Default Expiration", info["expiration"]])
-        if "private" in info:
-            data.append(["Default Exposure", EXPOSURE_REVERSED[info["private"]]])
 
         # If Beautiful Soup is installed, get some extra info.
         if bs4_installed:
             extra_info = pastebin_extras.get_user_details_extra(self.user_name)
             data += extra_info
+
+        # Add the default paste settings.
+        if "format_short" in info:
+            format_name = "Text"
+            for long_name, short_name in FORMATS.items():
+                if info["format_short"] == short_name:
+                    format_name = long_name
+            data.append(["Default Format", format_name])
+        if "expiration" in info:
+            data.append(["Default Expiration", EXPIRE_REVERSED[info["expiration"]]])
+        if "private" in info:
+            data.append(["Default Exposure", EXPOSURE_REVERSED[info["private"]]])
 
         # Show the user's details.
         user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data, info["avatar_url"])
