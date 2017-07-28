@@ -20,8 +20,8 @@ class ListRecentDialog(Gtk.Dialog):
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(1200, 500)
+        self.add_button("Cancel", Gtk.ResponseType.CLOSE)
         self.get_btn = self.add_button("Get Paste", DialogResponse.GET_PASTE)
-        self.add_button("Close", Gtk.ResponseType.CLOSE)
 
         # Create the columns for displaying the pastes.
         self.liststore = Gtk.ListStore(str, str, str, str, str)
