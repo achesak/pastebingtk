@@ -8,8 +8,6 @@
 #
 ################################################################################
 
-
-
 # Import os and platform for path manipulation.
 import os
 import platform
@@ -17,7 +15,7 @@ import platform
 
 def get_main_dir():
     """Gets the location of the main directory."""
-    
+
     # Get the path.
     if platform.system().lower() == "windows":
         main_dir = "C:\\.pastebingtk"
@@ -27,5 +25,5 @@ def get_main_dir():
     # Check to see if the directory exists, and create it if it doesn't.
     if not os.path.exists(main_dir) or not os.path.isdir(main_dir):
         os.makedirs(main_dir)
-    
+
     return main_dir

@@ -245,4 +245,3 @@ EXPOSURE_LIST = [
     "Unlisted",
     "Private"
 ]
-
