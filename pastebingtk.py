@@ -218,7 +218,7 @@ class PastebinGTK(Gtk.Window):
         exposure = EXPOSURE[exposure]
 
         # If the user isn't logged in, they can't create private pastes.
-        if not self.user_key and exposure == 2:
+        if not self.user_key and exposure == EXPOSURE["Private"]:
             show_alert_dialog(self, "Create Paste", "Anonymous users cannot create private pastes.")
             return
 
@@ -245,7 +245,7 @@ class PastebinGTK(Gtk.Window):
                             caught_spam = True
 
                 # Show the url.
-                if not caught_spam or exposure == 2:
+                if not caught_spam or exposure == EXPOSURE["Private"]:
                     show_alert_dialog(self, "Create Paste", "Paste has been successfully created, and can be found at the following URL:\n\n%s" % url)
                 else:
                     show_alert_dialog(self, "Create Paste", "Paste triggered automatic spam detection filter. Verify that you are not a bot by filling out the captcha at the following URL:\n\n%s" % url)
