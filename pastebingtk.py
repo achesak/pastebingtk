@@ -130,7 +130,7 @@ class PastebinGTK(Gtk.Window):
             ("quit", Gtk.STOCK_QUIT, "_Quit", "<Control>q", None, lambda x: self.exit("ignore", "this"))
         ])
         action_group.add_actions([
-            ("text_menu", None, "_Text"),
+            ("text_menu", None, "_File"),
             ("save", Gtk.STOCK_SAVE, "_Save to File...", "<Control>s", "Save to file", self.save_file),
             ("open", Gtk.STOCK_OPEN, "_Open from File...", "<Control>o", "Open from file", self.open_file)
         ])
