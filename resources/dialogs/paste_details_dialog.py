@@ -14,39 +14,41 @@ from resources.constants import *
 class PasteDetailsDialog(Gtk.Dialog):
     """Shows the paste details dialog."""
 
-    def __init__(self, parent, title, data):
+    def __init__(self, parent, title, name, username, url, views, created, expires):
         """Create the dialog."""
 
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
-        self.set_default_size(500, 300)
+        self.set_default_size(500, -1)
         self.add_button("View Paste", DialogResponse.VIEW_PASTE)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
 
-        # Create the columns.
-        self.liststore = Gtk.ListStore(str, str)
-        self.treeview = Gtk.TreeView(model=self.liststore)
-        self.treeview.set_headers_visible(False)
-        field_text = Gtk.CellRendererText()
-        field_col = Gtk.TreeViewColumn("Field", field_text, text=0)
-        field_col.set_min_width(100)
-        field_col.set_expand(True)
-        self.treeview.append_column(field_col)
-        value_text = Gtk.CellRendererText()
-        value_col = Gtk.TreeViewColumn("Value", value_text, text=1)
-        value_col.set_expand(True)
-        self.treeview.append_column(value_col)
-
-        # Build the interface.
-        scrolled_win = Gtk.ScrolledWindow()
-        scrolled_win.set_hexpand(True)
-        scrolled_win.set_vexpand(True)
-        scrolled_win.add(self.treeview)
-        self.get_content_area().add(scrolled_win)
-
-        # Add the data.
-        for i in data:
-            self.liststore.append(i)
+        # Create the labels.
+        dlg_box = self.get_content_area()
+        name_lbl = Gtk.Label()
+        name_lbl.set_markup("<span size=\"xx-large\"><a href=\"" + url + "\">" + name + "</a></span>")
+        name_lbl.set_margin_top(5)
+        dlg_box.add(name_lbl)
+        user_lbl = Gtk.Label()
+        user_lbl.set_markup("<span size=\"large\">Uploaded by <b>" + username + "</b></span>")
+        user_lbl.set_margin_top(5)
+        dlg_box.add(user_lbl)
+        view_lbl = Gtk.Label()
+        view_lbl.set_markup("<span size=\"medium\">" + views + " view%s</span>" % "s" if int(views) != 1 else "")
+        view_lbl.set_margin_top(15)
+        dlg_box.add(view_lbl)
+        create_lbl = Gtk.Label()
+        create_lbl.set_markup("<span size=\"medium\">Created on " + created + "</span>")
+        create_lbl.set_margin_top(15)
+        dlg_box.add(create_lbl)
+        expire_lbl = Gtk.Label()
+        if expires == "Never":
+            expire_lbl.set_markup("<span size=\"medium\">Expires never</span>")
+        else:
+            expire_lbl.set_markup("<span size=\"medium\">Expires in " + expires.lower() + "</span>")
+        expire_lbl.set_margin_top(5)
+        expire_lbl.set_margin_bottom(5)
+        dlg_box.add(expire_lbl)
 
         # Show the dialog.
         self.show_all()

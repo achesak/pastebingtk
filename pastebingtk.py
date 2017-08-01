@@ -376,23 +376,14 @@ class PastebinGTK(Gtk.Window):
             show_error_dialog(self, "Get Paste Info", "Paste could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
 
-        data = [
-            ["Name", info["name"]],
-            ["URL", "https://pastebin.com/" + key],
-            ["Uploaded by", info["username"]],
-            ["Views", info["views"]],
-            ["Upload time", info["uploaded"]],
-            ["Delete time", info["delete"]]
-        ]
-
         # Show the paste info.
-        paste_dlg = PasteDetailsDialog(self, "Paste Info for " + key, data)
+        paste_dlg = PasteDetailsDialog(self, "Paste Info for " + key, info["name"], info["username"], "https://pastebin.com/" + key, info["views"], info["uploaded"], info["delete"])
         response = paste_dlg.run()
         paste_dlg.destroy()
 
         # If the user pressed "View Paste", open the paste in a web browser.
         if response == DialogResponse.VIEW_PASTE:
-            webbrowser.open(data[1][1])
+            webbrowser.open("https://pastebin.com/" + key)
 
     def login(self, event):
         """Logs the user in."""

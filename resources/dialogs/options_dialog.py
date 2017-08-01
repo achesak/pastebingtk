@@ -171,8 +171,7 @@ class OptionsDialog(Gtk.Dialog):
         tech_grid.attach_next_to(self.devk_ent, devk_lbl, Gtk.PositionType.RIGHT, 1, 1)
 
         # Create the developer key description label.
-        devk_desc_lbl = Gtk.Label(
-            "Please add your own developer key to\nprevent limits to the number of pastes that\ncan be created.\nThank you.")
+        devk_desc_lbl = Gtk.Label("Please add your own developer key to\nprevent limits to the number of pastes that\ncan be created.\nThank you.")
         devk_desc_lbl.set_margin_left(5)
         devk_desc_lbl.set_margin_right(5)
         devk_desc_lbl.set_margin_bottom(5)
