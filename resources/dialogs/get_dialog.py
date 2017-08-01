@@ -44,6 +44,7 @@ class GetPasteDialog(Gtk.Dialog):
         key_frame.set_label("Paste key")
         self.key_ent = Gtk.Entry()
         self.key_ent.set_hexpand(True)
+        self.key_ent.grab_focus()
         key_frame.add(self.key_ent)
         new_grid.attach_next_to(key_frame, expo_frame, Gtk.PositionType.BOTTOM, 1, 1)
 
