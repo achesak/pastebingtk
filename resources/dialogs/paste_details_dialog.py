@@ -19,7 +19,7 @@ class PasteDetailsDialog(Gtk.Dialog):
 
         # Create the dialog.
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
-        self.set_default_size(600, 300)
+        self.set_default_size(500, 300)
         self.add_button("View Paste", DialogResponse.VIEW_PASTE)
         self.add_button("Close", Gtk.ResponseType.CLOSE)
 
@@ -29,7 +29,8 @@ class PasteDetailsDialog(Gtk.Dialog):
         self.treeview.set_headers_visible(False)
         field_text = Gtk.CellRendererText()
         field_col = Gtk.TreeViewColumn("Field", field_text, text=0)
-        field_col.set_min_width(250)
+        field_col.set_min_width(100)
+        field_col.set_expand(True)
         self.treeview.append_column(field_col)
         value_text = Gtk.CellRendererText()
         value_col = Gtk.TreeViewColumn("Value", value_text, text=1)
