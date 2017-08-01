@@ -26,6 +26,7 @@ class PasteDetailsDialog(Gtk.Dialog):
         # Create the columns.
         self.liststore = Gtk.ListStore(str, str)
         self.treeview = Gtk.TreeView(model=self.liststore)
+        self.treeview.set_headers_visible(False)
         field_text = Gtk.CellRendererText()
         field_col = Gtk.TreeViewColumn("Field", field_text, text=0)
         field_col.set_min_width(250)
