@@ -595,36 +595,13 @@ class PastebinGTK(Gtk.Window):
             show_error_dialog(self, "Get Account Details", "Details could not be retrieved.\n\nThis likely means that you are not connected to the internet, or the pastebin.com website is down.")
             return
 
-        # Format the data into the way the dialog uses it.
-        data = []
-        if "email" in info:
-            data.append(["Email", info["email"]])
-        if "website" in info:
-            data.append(["Website", info["website"] if info["website"] else "None provided"])
-        if "location" in info:
-            data.append(["Location", info["location"] if info["location"] else "None provided"])
-        if "account_type" in info:
-            data.append(["Account Type", ACCOUNT_TYPE[info["account_type"]]])
-
         # If Beautiful Soup is installed, get some extra info.
+        extra_info = []
         if bs4_installed:
             extra_info = pastebin_extras.get_user_details_extra(self.user_name)
-            data += extra_info
-
-        # Add the default paste settings.
-        if "format_short" in info:
-            format_name = "Text"
-            for long_name, short_name in FORMATS.items():
-                if info["format_short"] == short_name:
-                    format_name = long_name
-            data.append(["Default Format", format_name])
-        if "expiration" in info:
-            data.append(["Default Expiration", EXPIRE_REVERSED[info["expiration"]]])
-        if "private" in info:
-            data.append(["Default Exposure", EXPOSURE_REVERSED[info["private"]]])
 
         # Show the user's details.
-        user_dlg = UserDetailsDialog(self, "%s's Account Details" % self.user_name, data, info["avatar_url"])
+        user_dlg = UserDetailsDialog(self, "Account Details", info, extra_info)
         response = user_dlg.run()
         user_dlg.destroy()
 
