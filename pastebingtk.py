@@ -210,6 +210,9 @@ class PastebinGTK(Gtk.Window):
         format_ = new_dlg.form_com.get_active_text()
         expire = new_dlg.expi_com.get_active_text()
         exposure = new_dlg.expo_com.get_active_text()
+        userkey = self.user_key
+        if new_dlg.guest_chk.get_active():
+            userkey = ""
         new_dlg.destroy()
 
         # Get the paste values.
@@ -227,7 +230,7 @@ class PastebinGTK(Gtk.Window):
 
             try:
                 # Send the paste.
-                url = pastebin_api.create_paste(self.config["dev_key"], data=text, name=name, format_=format_, private=exposure, expire=expire, userkey=self.user_key)
+                url = pastebin_api.create_paste(self.config["dev_key"], data=text, name=name, format_=format_, private=exposure, expire=expire, userkey=userkey)
 
                 # Check for the spam filter, if the user wants that.
                 caught_spam = False

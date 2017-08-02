@@ -65,6 +65,12 @@ class CreatePasteDialog(Gtk.Dialog):
         self.expo_com.set_active(0)
         new_grid.attach_next_to(self.expo_com, expo_lbl, Gtk.PositionType.RIGHT, 1, 1)
 
+        # Create the anonymous paste checkbox
+        self.guest_chk = Gtk.CheckButton("Create paste as guest user")
+        self.guest_chk.set_margin_top(10)
+        self.guest_chk.set_margin_bottom(10)
+        new_grid.attach_next_to(self.guest_chk, expo_lbl, Gtk.PositionType.BOTTOM, 2, 1)
+
         # Connect 'Enter' key to the OK button.
         self.name_ent.set_activates_default(True)
         ok_btn = self.get_widget_for_response(response_id=Gtk.ResponseType.OK)
