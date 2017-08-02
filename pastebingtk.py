@@ -351,23 +351,25 @@ class PastebinGTK(Gtk.Window):
             else:
                 show_error_dialog(self, "Delete Paste", "Paste could not be deleted.\n\nThis likely means that you do not have the ability to delete the specified paste.")
 
-    def get_paste_info(self, event):
+    def get_paste_info(self, event, key=None):
         """Gets info on a provided paste."""
 
         if not bs4_installed:
             show_alert_dialog(self, "Get Paste Info", "This feature requires the BeautifulSoup 4 HTML parsing library to be installed.")
             return
 
-        # Get the key.
-        get_dlg = GetPasteDialog(self, title="Get Paste Info")
-        response = get_dlg.run()
-        key = get_dlg.key_ent.get_text()
-        if key.startswith("http") or key.startswith("www.") or key.startswith("pastebin"):
-            key = key.rsplit("/", 1)[-1]
-        get_dlg.destroy()
+        if key is None:
 
-        if response != Gtk.ResponseType.OK:
-            return
+            # Get the key.
+            get_dlg = GetPasteDialog(self, title="Get Paste Info")
+            response = get_dlg.run()
+            key = get_dlg.key_ent.get_text()
+            if key.startswith("http") or key.startswith("www.") or key.startswith("pastebin"):
+                key = key.rsplit("/", 1)[-1]
+            get_dlg.destroy()
+
+            if response != Gtk.ResponseType.OK:
+                return
 
         # Get the paste info.
         try:
@@ -515,6 +517,22 @@ class PastebinGTK(Gtk.Window):
             # Get the key and load the paste.
             key = model[treeiter][1]
             self.get_paste(event=None, key=key)
+
+        # If the user clicked "Get Details", get the paste details.
+        elif response == DialogResponse.VIEW_DETAILS:
+
+            if treeiter is None:
+                return
+
+            # Can't load private pastes due to API restrictions.
+            if (source == "user" and model[treeiter][5] == "Private") or \
+                    (source == "trending" and model[treeiter][4] == "Private"):
+                show_alert_dialog(self, title2, "Due to API restrictions PastebinGTK is unable to load private pastes.")
+                return
+
+            # Get the key and paste details
+            key = model[treeiter][1]
+            self.get_paste_info(event=None, key=key)
 
     def list_recent(self, event):
         """Lists recently created pastes."""

@@ -21,6 +21,7 @@ class ListTrendingPastesDialog(Gtk.Dialog):
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(1200, 500)
         self.add_button("Cancel", Gtk.ResponseType.CLOSE)
+        self.add_button("Get Details", DialogResponse.VIEW_DETAILS)
         self.get_btn = self.add_button("Get Paste", DialogResponse.GET_PASTE)
 
         # Create the columns for displaying the pastes.

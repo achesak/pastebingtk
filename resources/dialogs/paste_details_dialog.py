@@ -34,7 +34,7 @@ class PasteDetailsDialog(Gtk.Dialog):
         user_lbl.set_margin_top(5)
         dlg_box.add(user_lbl)
         view_lbl = Gtk.Label()
-        view_lbl.set_markup("<span size=\"medium\">" + views + " view%s</span>" % "s" if int(views) != 1 else "")
+        view_lbl.set_markup("<span size=\"medium\">" + views + " view%s</span>" % "s" if views != "1" else "")
         view_lbl.set_margin_top(15)
         dlg_box.add(view_lbl)
         create_lbl = Gtk.Label()

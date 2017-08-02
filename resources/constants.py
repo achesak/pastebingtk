@@ -16,3 +16,4 @@ class DialogResponse:
     GET_PASTE = 5
     VIEW_PROFILE = 9
     VIEW_PASTE = 10
+    VIEW_DETAILS = 11
