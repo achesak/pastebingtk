@@ -26,7 +26,6 @@ class UserDetailsDialog(Gtk.Dialog):
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(500, 400)
         self.add_button("View Profile", DialogResponse.VIEW_PROFILE)
-        self.add_button("Close", Gtk.ResponseType.CLOSE)
 
         # Create the columns.
         avatar_img = Gtk.Image()

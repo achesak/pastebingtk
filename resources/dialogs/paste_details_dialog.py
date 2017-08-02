@@ -21,7 +21,6 @@ class PasteDetailsDialog(Gtk.Dialog):
         Gtk.Dialog.__init__(self, title, parent, Gtk.DialogFlags.MODAL)
         self.set_default_size(500, -1)
         self.add_button("Get Paste", DialogResponse.GET_PASTE)
-        self.add_button("Close", Gtk.ResponseType.CLOSE)
 
         # Create the labels.
         dlg_box = self.get_content_area()
