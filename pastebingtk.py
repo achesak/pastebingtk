@@ -383,9 +383,9 @@ class PastebinGTK(Gtk.Window):
         response = paste_dlg.run()
         paste_dlg.destroy()
 
-        # If the user pressed "View Paste", open the paste in a web browser.
-        if response == DialogResponse.VIEW_PASTE:
-            webbrowser.open("https://pastebin.com/" + key)
+        # If the user pressed "Get Paste", open the paste.
+        if response == DialogResponse.GET_PASTE:
+            self.get_paste(event=None, key=key)
 
     def login(self, event):
         """Logs the user in."""
