@@ -571,6 +571,16 @@ class PastebinGTK(Gtk.Window):
             key = model[treeiter][1]
             self.get_paste(event=None, key=key)
 
+        # If the user clicked "Get Details", get the paste details.
+        elif response == DialogResponse.VIEW_DETAILS:
+
+            if treeiter is None:
+                return
+
+            # Get the key and paste details
+            key = model[treeiter][1]
+            self.get_paste_info(event=None, key=key)
+
     def get_user_details(self, event):
         """Gets the user's information and settings."""
 
