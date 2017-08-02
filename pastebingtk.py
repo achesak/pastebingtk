@@ -379,7 +379,7 @@ class PastebinGTK(Gtk.Window):
             return
 
         # Show the paste info.
-        paste_dlg = PasteDetailsDialog(self, "Paste Info for " + key, info["name"], info["username"], "https://pastebin.com/" + key, info["views"], info["uploaded"], info["delete"])
+        paste_dlg = PasteDetailsDialog(self, "Paste Info", info["name"], info["username"], "https://pastebin.com/" + key, info["views"], info["uploaded"], info["delete"])
         response = paste_dlg.run()
         paste_dlg.destroy()
 
