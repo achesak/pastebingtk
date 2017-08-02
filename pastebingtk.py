@@ -666,6 +666,9 @@ class PastebinGTK(Gtk.Window):
 
             self.text_view.set_show_line_numbers(self.config["line_numbers"])
 
+            # Save the configuration.
+            io.save_config(self.main_dir, self.config)
+
         opt_dlg.destroy()
 
     def show_about(self, event):
